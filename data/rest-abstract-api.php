@@ -10,7 +10,7 @@ abstract class RestAbstractApi
      * Property: endpoint
      * The Model requested in the URI. eg: /files
      */
-    protected $endpoint = 'Database';
+    protected $endpoint = 'GenericProcess';
     /**
      * Property: verb
      * An optional additional descriptor about the endpoint, used for things that can
@@ -41,7 +41,7 @@ abstract class RestAbstractApi
 
         $this->args = explode('/', rtrim($request, '/'));
         $this->endpoint = array_shift($this->args);
-        $this->endpoint =  'Database';
+        $this->endpoint =  'GenericProcess';
         if (array_key_exists(0, $this->args) && !is_numeric($this->args[0])) {
             $this->verb = array_shift($this->args);
         }
