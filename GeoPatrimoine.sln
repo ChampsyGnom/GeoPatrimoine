@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "GeoPatrimoine", "http://localhost:4621", "{4AF40D88-FC44-49E7-B81E-CAF6B0FE074A}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_4621"
+		Debug.AspNetCompiler.PhysicalPath = "..\GeoPatrimoine\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_4621\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_4621"
+		Release.AspNetCompiler.PhysicalPath = "..\GeoPatrimoine\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_4621\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "..\GeoPatrimoine\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AF40D88-FC44-49E7-B81E-CAF6B0FE074A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF40D88-FC44-49E7-B81E-CAF6B0FE074A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
