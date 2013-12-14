@@ -3,11 +3,12 @@ Ext.application({
     autoCreateViewport: false,
     requires: [
         'GeoPatrimoine.view.header.PanelHeader',
-        'GeoPatrimoine.view.user.WindowLogin'
+        'GeoPatrimoine.view.user.WindowLogin',
+        'GeoPatrimoine.util.MD5'
     ],
-    models: ['Lang', 'LangResource'],
-    stores: ['GeoPatrimoine.store.LangResource'],
-    controllers: [],
+    models: ['Lang', 'LangResource','User'],
+    stores: ['GeoPatrimoine.store.LangResource', 'User'],
+    controllers: ['User'],
     init: function (application) {
         console.log("init");
      

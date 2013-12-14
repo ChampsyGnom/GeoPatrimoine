@@ -1,7 +1,7 @@
 Ext.define('GeoPatrimoine.view.user.WindowLogin', {
 
     extend: 'Ext.window.Window',
-    alias: 'widget.windowstyle',
+    alias: 'widget.windowlogin',
     width: 400,
     closable: false,
     icon:'./resources/icons/32x32/user.png',
@@ -51,6 +51,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                 buttons : [
                     {
                         xtype: 'button',
+                        itemId: 'buttton-connect',
                         formBind:true,
                         text:GeoPatrimoine.model.Lang.langViewWindowLoginButtonConnect,
                     }
