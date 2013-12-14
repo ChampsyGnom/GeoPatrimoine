@@ -2,7 +2,8 @@ Ext.application({
     name: 'GeoPatrimoine',
     autoCreateViewport: false,
     requires: [
-        'GeoPatrimoine.view.header.PanelHeader'
+        'GeoPatrimoine.view.header.PanelHeader',
+        'GeoPatrimoine.view.user.WindowLogin'
     ],
     models: ['Lang', 'LangResource'],
     stores: ['GeoPatrimoine.store.LangResource'],
@@ -21,7 +22,11 @@ Ext.application({
         storeLangResource.load(
             {
                 callback: function ()
-                { Ext.create('GeoPatrimoine.view.Viewport'); }
+                {
+                    Ext.create('GeoPatrimoine.view.Viewport');
+                    var windowLogin = Ext.create('GeoPatrimoine.view.user.WindowLogin');
+                    windowLogin.show();
+                }
             }
             );
        

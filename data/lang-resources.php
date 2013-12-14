@@ -6,39 +6,34 @@ $lang = 'fr';
 if (isset($_GET['lang']))
 {$lang = $_GET['lang'];}
 
-$jsons = [];
+$headers = null;
+$nbHeader = 0;
+$nbLang = 0;
 $langs = [];
-if ($lang === 'fr')
+$ini_array = parse_ini_file("../resources/lang.ini", $process_sections = true);
+
+
+
+$json = [];
+$datas = [];
+
+$langData = $ini_array[$lang];
+$dataCount = count($langData);
+
+foreach ($langData as $key => $value)
 {
-	$lang = [];
-	$lang["name"] = "langViewPanelHeaderTitle";
-	$lang["value"] = "GéoPatrimoine";
-	array_push($langs,$lang);
-
-	$lang = [];
-	$lang["name"] = "langComboLangFieldLabel";
-	$lang["value"] = "Langue ";
-	array_push($langs,$lang);
-
-	
+  $data = [];
+  $data["name"] = $key;
+  $data["value"] = $value;
+  array_push($datas,$data);
 }
-if ($lang === 'en')
-{
-	$lang = [];
-	$lang["name"] = "langViewPanelHeaderTitle";
-	$lang["value"] = "Gis Tech";
-	array_push($langs,$lang);
+    
+    
 
-	$lang = [];
-	$lang["name"] = "langComboLangFieldLabel";
-	$lang["value"] = "Language ";
-	array_push($langs,$lang);
+$json["datas"] = $datas;
+$json["count"] = count($datas);
+$json["success"] =true;
+echo json_encode($json);
 
-}
-
-
-
-$jsons["datas"] = $langs;
-$jsons["count"] = count($langs);
-echo json_encode($jsons)
+die();
 ?>

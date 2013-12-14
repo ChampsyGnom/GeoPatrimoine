@@ -12,9 +12,7 @@ Ext.define('GeoPatrimoine.view.header.PanelHeader', {
     initComponent: function (config) {
 
         console.log("appli langViewPanelHeaderTitle to " + GeoPatrimoine.model.Lang.langViewPanelHeaderTitle);
-        Ext.apply(this, {           
-           // title: GeoPatrimoine.model.Lang.langViewPanelHeaderTitle
-        });
+       
         this.items = [
         {
             xtype: 'label',
