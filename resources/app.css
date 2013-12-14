@@ -1,0 +1,17 @@
+﻿.label-header {
+    
+     font-family :Calibri; 
+     font-weight : normal ;
+     font-style : normal;
+     font-size:32px;
+     color : white;
+     text-decoration : none ;
+     text-shadow:1px 1px 1px #8EB2CC;
+
+
+}
+.combo-language {
+    color : white;
+    font-weight: bold;
+    margin: 0px 14px 0px 0px;
+}

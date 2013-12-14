@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>VS2012-Javascript-Intellisense</id>
+    <version>1.0.712.2147</version>
+    <title>VS2012 Javascript Intellisense</title>
+    <authors>DotNetWise</authors>
+    <owners>DotNetWise</owners>
+    <projectUrl>https://github.com/DotNetWise/VS2012-Javascript-Intellisense</projectUrl>
+    <iconUrl>https://raw.github.com/wiki/dotnetwise/VS2012-Javascript-Intellisense/images/NugetIcon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Enhanced VS2012 Javascript intellisense for variables, properties, methods even prototype's methods!</description>
+    <summary>Enhanced VS2012 Javascript intellisense for variables, properties, methods even prototype's methods!</summary>
+    <releaseNotes>Fixed &lt;br/&gt;&gt; xml2json serialization
+      Added intellisense.inheritXMLDoc and intellisense.cloneXMLDoc helpers so you can copy XMLDoc from one function to another
+      Added support for __computed, __observable and __observableArray
+      __namespace and __enum are now non-enumerable
+      Added commented code for WAssert and String.format so you can use them in order to write intellisense specific code that won't get in the .min.js files
+      Added custom __glyph support. Set it to a valid glyph icon and will take precedence.
+      Added __hidden support. Set it to a truish value and that element will not be displayed!</releaseNotes>
+    <copyright>Copyright &amp;copy; DotNetWise 2013. This is an open-source project, you can edit and use it for free. Share!</copyright>
+    <language>en-US</language>
+    <tags>Javascript VS2012 intellisense enum namespace class prototype method object autocomplete dotnetwise dnw</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.0" />
+    </dependencies>
+  </metadata>
+</package>
