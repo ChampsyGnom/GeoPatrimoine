@@ -9,7 +9,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
     modal: true,
     title: 'Authentification',
     initComponent: function (config) {
-        this.title =  GeoPatrimoine.model.Lang.langViewWindowLoginTitle;
+        this.title =  GeoPatrimoine.lang.WindowLoginTitle;
         this.items=  [
             {
                 xtype: 'form',
@@ -21,7 +21,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                     {
                         xtype: 'textfield',
                         allowBlank:false,
-                        fieldLabel: GeoPatrimoine.model.Lang.langViewWindowLoginFieldLoginLabel,
+                        fieldLabel: GeoPatrimoine.lang.WindowLoginFieldLoginLabel,
                         labelWidth: 120,
                         name: 'user_name',
                         margin:4
@@ -30,7 +30,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                   ,
                    {
                        xtype: 'textfield',
-                       fieldLabel: GeoPatrimoine.model.Lang.langViewWindowLoginFieldPasswordLabel,
+                       fieldLabel: GeoPatrimoine.lang.WindowLoginFieldPasswordLabel,
                        allowBlank: false,
                        labelWidth: 120,
                        inputType:'password',
@@ -41,7 +41,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                    ,
                     {
                         xtype: 'checkbox',
-                        boxLabel: GeoPatrimoine.model.Lang.langViewWindowLoginFieldCheckAutoConnectLabel,
+                        boxLabel: GeoPatrimoine.lang.WindowLoginFieldCheckAutoConnectLabel,
                         name: 'chk_auto_login',
                         margin: 4
                        
@@ -52,8 +52,9 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                     {
                         xtype: 'button',
                         itemId: 'buttton-connect',
+                        icon: './resources/icons/16x16/connect.png',
                         formBind:true,
-                        text:GeoPatrimoine.model.Lang.langViewWindowLoginButtonConnect
+                        text:GeoPatrimoine.lang.WindowLoginButtonConnect
                     }
         
                 ]

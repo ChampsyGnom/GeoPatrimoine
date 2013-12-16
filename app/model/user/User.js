@@ -1,6 +1,6 @@
 Ext.define('GeoPatrimoine.model.user.User', {
     extend: 'Ext.data.Model',
-    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.user.UserProfil'
+    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.user.Profil'
     ],
     idProperty: 'id',  
     fields: [
@@ -12,14 +12,29 @@ Ext.define('GeoPatrimoine.model.user.User', {
          { name: 'token', type: 'string', mapping: 'token' },
     ],
     
+    isGeoPatrimoineAdministrator: function ()
+    {
+        var result = false;
+        this.profils().each(function (profil) {
+            if (profil.data.id === 1)
+            {
+                profil.permissions().each(function (permission) {
+                    if (permission.data.id === 1)
+                    { result = true; }
+                });
+            }
+        });
+        return result;
+
+    },
     associations: [
       {
           type: 'hasMany',
-          foreignKey: 'user__id',
+          foreignKey: 'profil__id',
           primaryKey: 'id',
-          associationKey: 'user_profils',
-          name: 'userProfils',
-          model: 'GeoPatrimoine.model.user.UserProfil'
+          associationKey: 'profils',
+          name: 'profils',
+          model: 'GeoPatrimoine.model.user.Profil'
       }
        
     ],
@@ -39,26 +54,16 @@ Ext.define('GeoPatrimoine.model.user.User', {
             tableName: 'user',
             childTables: Ext.JSON.encode( [
                 {
-                    tableName: 'user_profil',
+                    tableName: 'profil',
                     childTables : [
-                    
-                                {
-                                    tableName: 'profil',
-                                    childTables: [
-                                        
-                                        {
-                                            tableName: 'profil_permission',
-                                            childTables: [
-                                                 {
-                                                     tableName: 'permission',
-                                                     childTables: [
-                                                     ]
-                                                 }
-                                            ]
-                                        }
-                                        
-                                ]
-                        } 
+                        {
+                            tableName: 'permission',
+                            childTables: [
+
+
+                            ]
+                        }
+                                
                     ]
                 }
             ])

@@ -1,14 +1,22 @@
 ﻿.label-header {
-    
-     font-family :Calibri; 
-     font-weight : normal ;
-     font-style : normal;
-     font-size:32px;
+    font-family: Calibri;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 40px;
+    color: white;
+    text-decoration: none;
+    -webkit-text-shadow: 1px 1px 1px #8EB2CC;
+    text-shadow: 1px 1px 1px #8EB2CC;
+}
+.label-user-name {
      color : white;
-     text-decoration : none ;
-     text-shadow:1px 1px 1px #8EB2CC;
-
-
+    font-weight: bold;
+    margin: 0px 14px 0px 0px;
+}
+.txt-user-name {
+     color : white;
+    font-weight: normal;
+    margin: 0px 14px 0px 0px;
 }
 .combo-language {
     color : white;

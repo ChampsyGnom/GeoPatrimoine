@@ -1,4 +1,4 @@
-Ext.define('GeoPatrimoine.model.LangResource', {
+Ext.define('GeoPatrimoine.model.lang.LangResource', {
     extend: 'Ext.data.Model',
     fields: [
        { name: 'name', type: 'string' },

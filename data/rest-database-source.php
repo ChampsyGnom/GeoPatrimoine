@@ -141,7 +141,18 @@ class RestDatabaseSource extends RestAbstractSource
                         $selectExpression = $this->GetSelectExpression($schemaName,$childTable["tableName"],$childTableColumn);
                         array_push($childTableSelectExpressions,$selectExpression);
                     }
-                    $sql = "SELECT ".implode(",",$childTableSelectExpressions)." FROM ".$schemaName.".".$childTable["tableName"].",".$schemaName.".".$tableName." WHERE ".$whereJoin." AND ".$whereParent;
+                    $allWheres = [];
+                    array_push($allWheres,$whereParent);
+                    for($i = 0; $i<count($whereJoin["wheres"]);$i++)
+                    {array_push($allWheres,$whereJoin["wheres"][$i]);}
+                    $allTables = [];
+                    array_push($allTables,$schemaName.".".$childTable["tableName"]);
+                    array_push($allTables,$schemaName.".".$tableName);
+                    for($i = 0; $i<count($whereJoin["tables"]);$i++)
+                    {
+                     array_push($allTables,$whereJoin["tables"][$i]);
+                    }
+                    $sql = "SELECT ".implode(",",$childTableSelectExpressions)." FROM ".implode(",",$allTables)." WHERE ".implode(" AND ",$allWheres);
                    
                     $result = $this->FetchAllRows($sql);
                   
@@ -215,8 +226,27 @@ class RestDatabaseSource extends RestAbstractSource
         }
         return implode(" AND ",$wheres);
     }
+     function IsColumnExist($schemaName,$tableName,$columnName)
+    {
+        $sql =  "SELECT count(*) as total FROM information_schema.columns WHERE table_schema = ".$this->ToSqlString($schemaName)." AND table_name   = ".$this->ToSqlString($tableName)." and column_name='".$columnName."'";
+       
+        $result = $this->FetchAllRows($sql);        
+        $rows = $result["rows"];
+       
+        return $rows [0]["total"] >0;
+    }
+    function IsTableExist($schemaName,$tableName)
+    {
+        $sql = "select count(*) as total from pg_tables where schemaname='".$schemaName."' and tablename='".$tableName."'";
+     
+        $result = $this->FetchAllRows($sql);        
+        $rows = $result["rows"];
+       
+        return $rows [0]["total"]>0;
+    }
     function GetWhereJoin($schema,$parentTable,$childTable)
     {
+        $infos = [];
         $sql = "SELECT ";
         $sql .= "tc.constraint_name, tc.table_name, kcu.column_name, ";
         $sql .= "ccu.table_name AS foreign_table_name, ";
@@ -231,7 +261,7 @@ class RestDatabaseSource extends RestAbstractSource
         $sql .= "AND tc.table_name='".$childTable."' ";
         $sql .= "and ccu.table_name='".$parentTable."'";
         $result = $this->FetchAllRows($sql);
-        
+        $infos["tables"] = [];
         $rows = $result["rows"];
         $wheres = [];
         foreach ($rows as &$row) 
@@ -241,30 +271,40 @@ class RestDatabaseSource extends RestAbstractSource
         }
         if (count($wheres) === 0)
         {
-       
-            $sql = "SELECT ";
-            $sql .= "tc.constraint_name, tc.table_name, kcu.column_name, ";
-            $sql .= "ccu.table_name AS foreign_table_name, ";
-            $sql .= "ccu.column_name AS foreign_column_name ";
-            $sql .= "FROM ";
-            $sql .= "information_schema.table_constraints AS tc ";
-            $sql .= "JOIN information_schema.key_column_usage AS kcu ";
-            $sql .= "ON tc.constraint_name = kcu.constraint_name ";
-            $sql .= "JOIN information_schema.constraint_column_usage AS ccu ";
-            $sql .= "ON ccu.constraint_name = tc.constraint_name ";
-            $sql .= "WHERE constraint_type = 'FOREIGN KEY' ";
-            $sql .= "AND tc.table_name='".$parentTable."' ";
-            $sql .= "and ccu.table_name='".$childTable."'";
-            $result = $this->FetchAllRows($sql);
-            foreach ($result["rows"] as &$row) 
+           
+            if($this->IsTableExist($schema,$childTable."_".$parentTable))
             {
                 
-                $where = $schema.".".$childTable.".".$row["foreign_column_name"]."=".$schema.".".$parentTable.".".$row["column_name"];
-                array_push($wheres,$where);
+                if ($this->IsColumnExist($schema,$childTable."_".$parentTable,$childTable."__id") && 
+                $this->IsColumnExist($schema,$childTable."_".$parentTable,$parentTable."__id"))
+                {
+                    array_push($infos["tables"],$schema.".".$childTable."_".$parentTable);
+                    $where = $schema.".".$childTable.".id=".$schema.".".$childTable."_".$parentTable.".".$childTable."__id";
+                    array_push($wheres,$where);
+                    $where = $schema.".".$parentTable.".id=".$schema.".".$childTable."_".$parentTable.".".$parentTable."__id";
+                    array_push($wheres,$where);
+                   
+                }
             }
-           
+            else if($this->IsTableExist($schema,$parentTable."_".$childTable))
+            {
+                
+                if ($this->IsColumnExist($schema,$parentTable."_".$childTable,$childTable."__id") && 
+                $this->IsColumnExist($schema,$parentTable."_".$childTable,$parentTable."__id"))
+                { 
+                    array_push($infos["tables"],$schema.".".$parentTable."_".$childTable);
+                     $where = $schema.".".$childTable.".id=".$schema.".".$parentTable."_".$childTable.".".$childTable."__id";
+                    array_push($wheres,$where);
+                    $where = $schema.".".$parentTable.".id=".$schema.".".$parentTable."_".$childTable.".".$parentTable."__id";
+                    array_push($wheres,$where);
+                   
+                }
+            }
         }
-        return implode(" AND ",$wheres);
+        $infos["wheres"] = $wheres;
+        
+        
+        return $infos;
     }
     
     
@@ -464,7 +504,9 @@ class RestDatabaseSource extends RestAbstractSource
         if ($this->databaseConfiguration !== null)
         {
              $connectionString = "host=".$this->databaseConfiguration["host"]." port=".$this->databaseConfiguration["port"]." dbname=".$this->databaseConfiguration["database"]." user=".$this->databaseConfiguration["login"]." password=".$this->databaseConfiguration["password"]."";
-             $this->connection = pg_connect($connectionString);
+             $this->connection = @pg_connect($connectionString);
+             if ($this->connection === false)
+             { throw new Exception('Impossible de se connecter '+$connectionString);}
         }
         else
         {

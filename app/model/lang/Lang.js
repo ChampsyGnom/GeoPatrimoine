@@ -1,4 +1,4 @@
-Ext.define('GeoPatrimoine.model.Lang', {
+Ext.define('GeoPatrimoine.model.lang.Lang', {
     extend: 'Ext.util.Observable',
     singleton: true,
     currentLang :'fr',

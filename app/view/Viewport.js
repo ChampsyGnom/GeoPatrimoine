@@ -21,7 +21,8 @@ Ext.define('GeoPatrimoine.view.Viewport', {
                        xtype: 'panel',
                        title: 'Navigation',
                        split: true,
-                       width:200,
+                       width: 260,
+                       
                        collapsible:true,
                        layout: {                         
                            type: 'accordion',
@@ -32,10 +33,30 @@ Ext.define('GeoPatrimoine.view.Viewport', {
                        region: 'west',
                        items: [
                            {
-                               xtype:'panelsearch'
+                               xtype: 'panelsearch',
+                               width: 260,
+                               collapsible: true,
+                               collapsed:true
+                              
                            },
                            {
-                               xtype: 'paneltemplate'
+                               xtype: 'panel',
+                               width: 260,
+                               collapsible: true,
+                               collapsed: false,
+                               title: 'Tableau de bord',
+                               layout: 'border',
+                               items: [
+                                   {
+                                       xtype: 'paneltemplatelist',
+                                       region:'north'
+                                   },
+                                    {
+                                        xtype: 'paneltemplatetree',
+                                        region: 'center'
+                                    }
+                               ]
+
 
                            }
                        ]
