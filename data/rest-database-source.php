@@ -132,10 +132,10 @@ class RestDatabaseSource extends RestAbstractSource
                
                 if (isset($childTable["tableName"]))
                 {
-                    $whereJoin = $this->GetWhereJoin($schemaName,$tableName,$childTable["tableName"],$format);
-                    $childTableColumns = $this->GetColumnInfos($schemaName,$childTable["tableName"],$format);
+                    $whereJoin = $this->GetWhereJoin($schemaName,$tableName,$childTable["tableName"]);
+                    $childTableColumns = $this->GetColumnInfos($schemaName,$childTable["tableName"]);
                     $childTableSelectExpressions = [];
-                    $whereParent = $this->GetPrimaryKeyWhereFromValues($schemaName,$tableName,$row,$format);
+                    $whereParent = $this->GetPrimaryKeyWhereFromValues($schemaName,$tableName,$row);
                     foreach ($childTableColumns as &$childTableColumn) 
                     {
                         $selectExpression = $this->GetSelectExpression($schemaName,$childTable["tableName"],$childTableColumn);
@@ -151,13 +151,38 @@ class RestDatabaseSource extends RestAbstractSource
                     {
                        
                         $subChildTablesObjects =  $childTable["childTables"];
-                        $childRows = $this->RecurseLoadChildTable($schemaName,$childTable["tableName"],$childRows,$subChildTablesObjects,$format);
+                        $childRows = $this->RecurseLoadChildTable($schemaName,$childTable["tableName"],$childRows,$subChildTablesObjects);
                     }
-                     $row[$childTable["tableName"]."s"] = $childRows;
+                    if ($this->IsOneRelationShip($schemaName,$tableName,$childTable["tableName"]))
+                    { $row[$childTable["tableName"]] = $childRows;}
+                    else
+                    { $row[$childTable["tableName"]."s"] = $childRows;}
+                    
                 }
             }
         }
         return $rows;
+    }
+    
+    function IsOneRelationShip($schema,$parentTable,$childTable)
+    {
+            $sql = "SELECT ";
+            $sql .= "tc.constraint_name, tc.table_name, kcu.column_name, ";
+            $sql .= "ccu.table_name AS foreign_table_name, ";
+            $sql .= "ccu.column_name AS foreign_column_name ";
+            $sql .= "FROM ";
+            $sql .= "information_schema.table_constraints AS tc ";
+            $sql .= "JOIN information_schema.key_column_usage AS kcu ";
+            $sql .= "ON tc.constraint_name = kcu.constraint_name ";
+            $sql .= "JOIN information_schema.constraint_column_usage AS ccu ";
+            $sql .= "ON ccu.constraint_name = tc.constraint_name ";
+            $sql .= "WHERE constraint_type = 'FOREIGN KEY' ";
+            $sql .= "AND tc.table_name='".$parentTable."' ";
+            $sql .= "and ccu.table_name='".$childTable."'";
+            $result = $this->FetchAllRows($sql);
+            if (count($result["rows"]) > 0)
+            {return true;}
+            return false;
     }
     function GetPrimaryKeyWhereFromValues($schema,$table,$values)
     {
@@ -214,6 +239,31 @@ class RestDatabaseSource extends RestAbstractSource
             $where = $schema.".".$parentTable.".".$row["foreign_column_name"]."=".$schema.".".$childTable.".".$row["column_name"];
             array_push($wheres,$where);
         }
+        if (count($wheres) === 0)
+        {
+       
+            $sql = "SELECT ";
+            $sql .= "tc.constraint_name, tc.table_name, kcu.column_name, ";
+            $sql .= "ccu.table_name AS foreign_table_name, ";
+            $sql .= "ccu.column_name AS foreign_column_name ";
+            $sql .= "FROM ";
+            $sql .= "information_schema.table_constraints AS tc ";
+            $sql .= "JOIN information_schema.key_column_usage AS kcu ";
+            $sql .= "ON tc.constraint_name = kcu.constraint_name ";
+            $sql .= "JOIN information_schema.constraint_column_usage AS ccu ";
+            $sql .= "ON ccu.constraint_name = tc.constraint_name ";
+            $sql .= "WHERE constraint_type = 'FOREIGN KEY' ";
+            $sql .= "AND tc.table_name='".$parentTable."' ";
+            $sql .= "and ccu.table_name='".$childTable."'";
+            $result = $this->FetchAllRows($sql);
+            foreach ($result["rows"] as &$row) 
+            {
+                
+                $where = $schema.".".$childTable.".".$row["foreign_column_name"]."=".$schema.".".$parentTable.".".$row["column_name"];
+                array_push($wheres,$where);
+            }
+           
+        }
         return implode(" AND ",$wheres);
     }
     
@@ -253,6 +303,7 @@ class RestDatabaseSource extends RestAbstractSource
         {
            $rows =[];
            $result = pg_query($this->connection, $sql);   
+           
            while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
            {array_push($rows,$row);}
            pg_free_result($result);

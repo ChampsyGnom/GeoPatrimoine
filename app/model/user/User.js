@@ -1,6 +1,6 @@
 Ext.define('GeoPatrimoine.model.user.User', {
     extend: 'Ext.data.Model',
-    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo' , 'GeoPatrimoine.model.user.UserProfil'
+    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.user.UserProfil'
     ],
     idProperty: 'id',  
     fields: [
@@ -17,7 +17,7 @@ Ext.define('GeoPatrimoine.model.user.User', {
           type: 'hasMany',
           foreignKey: 'user__id',
           primaryKey: 'id',
-          associationKey: 'userProfils',
+          associationKey: 'user_profils',
           name: 'userProfils',
           model: 'GeoPatrimoine.model.user.UserProfil'
       }
@@ -45,7 +45,7 @@ Ext.define('GeoPatrimoine.model.user.User', {
                                 {
                                     tableName: 'profil',
                                     childTables: [
-                                        /*
+                                        
                                         {
                                             tableName: 'profil_permission',
                                             childTables: [
@@ -56,7 +56,7 @@ Ext.define('GeoPatrimoine.model.user.User', {
                                                  }
                                             ]
                                         }
-                                        */
+                                        
                                 ]
                         } 
                     ]
