@@ -6,7 +6,7 @@ class RestApi extends RestAbstractApi
    
     protected $source = null;
     protected $output = null;
-    public function __construct($request, $origin)
+    public function __construct($request)
     {
         parent::__construct($request);
     }

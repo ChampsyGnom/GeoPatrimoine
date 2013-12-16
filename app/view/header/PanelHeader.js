@@ -26,10 +26,10 @@ Ext.define('GeoPatrimoine.view.header.PanelHeader', {
             labelCls: 'combo-language',
             itemId:'combo-language',
             fieldLabel: GeoPatrimoine.model.Lang.langComboLangFieldLabel,
-            width: 100,
+            width: 200,
             margin:10,
-            labelWidth: 100,
-            labelAlign: 'top',
+            labelWidth: 80,
+            labelAlign: 'left',
             queryMode: 'local',
             editable:false,
             displayField: 'displayName',
@@ -52,6 +52,14 @@ Ext.define('GeoPatrimoine.view.header.PanelHeader', {
                        
                     }
                 }
+        },
+        {
+
+            xtype: 'button',
+            itemId:'button-disconnect',
+            text: GeoPatrimoine.model.Lang.langViewPanelHeaderButtonDisconnect,
+            width:100,
+            margin:4
         }
 
         ];

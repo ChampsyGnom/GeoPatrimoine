@@ -44,18 +44,85 @@ class RestDatabaseSource extends RestAbstractSource
         $datas = [];
         $sqlSelectExpressions = [];
         $sqlTableExpressions = [];
+        $sqlWhereExpressions = [];
+        $filters = [];
+        if (isset($_GET['filter']))
+        {
+            $filterArray = json_decode($_GET['filter']);
+            if (is_array($filterArray))
+            {$filters = $filterArray;}
+            else
+            {array_push($filters,$filterArray);}
+        }
+        
+        for($i = 0 ; $i< count($filters);$i++)
+        {
+            for($j = 0 ; $j < count($tableColumns) ; $j++)
+            {
+                $values = get_object_vars($filters[$i]);
+                if ($values["property"] === $tableColumns[$j]["name"])
+                {
+                    $operator = "=";
+                    if (isset($values["operator"]))
+                    {$operator = $values["operator"];}
+                    $sqlWhereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$j],$operator,$values["value"]);
+                    array_push($sqlWhereExpressions,$sqlWhereExpression);
+                }
+            }
+        }
+        
         array_push($sqlTableExpressions,$schemaName.".".$tableName);
         for($i = 0 ; $i < count($sqlColumns) ; $i++)
-        {array_push($sqlSelectExpressions,$this->GetSelectExpression($schemaName,$tableName,$sqlColumns[$i]));}
-         
+        {array_push($sqlSelectExpressions,$this->GetSelectExpression($schemaName,$tableName,$sqlColumns[$i]));}         
         $sqlCount = "select count(*) as total from ".implode(",",$sqlTableExpressions); 
+        if (count($sqlWhereExpressions) > 0)
+        {$sqlCount .= " where ".implode(" and ",$sqlWhereExpressions); }
         $rows = $this->FetchAllRows($sqlCount);     
         $datas["total"] = $rows["rows"][0]["total"];
+        
+        
+        
+        
         $sql = "select ".implode(",",$sqlSelectExpressions)." from ".implode(",",$sqlTableExpressions);
-        $rows = $this->FetchAllRows($sql);
+        if (count($sqlWhereExpressions) > 0)
+        {$sql .= " where ".implode(" and ",$sqlWhereExpressions); }       
+        $rows = $this->FetchAllRows($sql);       
+        if (isset($_SESSION['token']) === false ) {
+            $token = md5($_SERVER["REMOTE_ADDR"].".".$_SERVER["REQUEST_TIME_FLOAT"].".".$_SERVER["SERVER_NAME"]);
+            for($i = 0 ; $i < count($rows["rows"]);$i++)
+            {
+                $rows["rows"][$i]["token"] = $token;
+                $_SESSION["token"]=  $token;
+            }
+        } 
+        else
+        {
+            if ($schemaName ==='public' && $tableName==='user')
+            {
+                 for($i = 0 ; $i < count($rows["rows"]);$i++)
+                 {
+                    $rows["rows"][$i]["token"] = $_SESSION['token'];
+                    
+                 }
+            }
+        }
+        
         $datas["rows"] = $rows["rows"];
         return $datas;
         
+     }
+     function GetWhereExpression($schemaName,$tableName,$column,$operator,$value)
+     {
+        if ($column["dataType"] === 'text')
+        {
+            $isMd5 = strpos($value, "md5_")  !== false;
+            if ($isMd5)
+            {return "lower(md5(".$schemaName.".".$tableName.".".$column["name"].")) = lower(".$this->ToSqlString(substr($value,4)).")";}
+            else
+            {return $schemaName.".".$tableName.".".$column["name"]." = ".$this->ToSqlString($value);}
+     
+        }
+        return null;
      }
      function GetSelectExpression($schemaName,$tableName,$column)
      {

@@ -24,7 +24,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                         fieldLabel: GeoPatrimoine.model.Lang.langViewWindowLoginFieldLoginLabel,
                         labelWidth: 120,
                         name: 'user_name',
-                        margin:4,
+                        margin:4
                        
                     }
                   ,
@@ -35,7 +35,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                        labelWidth: 120,
                        inputType:'password',
                        name: 'user_password',
-                       margin: 4,
+                       margin: 4
                        
                    }
                    ,
@@ -43,7 +43,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                         xtype: 'checkbox',
                         boxLabel: GeoPatrimoine.model.Lang.langViewWindowLoginFieldCheckAutoConnectLabel,
                         name: 'chk_auto_login',
-                        margin: 4,
+                        margin: 4
                        
                     }
 
@@ -53,7 +53,7 @@ Ext.define('GeoPatrimoine.view.user.WindowLogin', {
                         xtype: 'button',
                         itemId: 'buttton-connect',
                         formBind:true,
-                        text:GeoPatrimoine.model.Lang.langViewWindowLoginButtonConnect,
+                        text:GeoPatrimoine.model.Lang.langViewWindowLoginButtonConnect
                     }
         
                 ]

@@ -4,9 +4,13 @@ Ext.application({
     requires: [
         'GeoPatrimoine.view.header.PanelHeader',
         'GeoPatrimoine.view.user.WindowLogin',
-        'GeoPatrimoine.util.MD5'
+        'GeoPatrimoine.util.MD5',
+        'GeoPatrimoine.view.map.ToolbarMap',
+        'GeoPatrimoine.view.map.PanelMap',
+        'GeoPatrimoine.view.search.PanelSearch',
+        'GeoPatrimoine.view.template.PanelTemplate'
     ],
-    models: ['Lang', 'LangResource','User'],
+    models: ['Lang', 'LangResource', 'user.User'],
     stores: ['GeoPatrimoine.store.LangResource', 'User'],
     controllers: ['User'],
     init: function (application) {
@@ -25,8 +29,9 @@ Ext.application({
                 callback: function ()
                 {
                     Ext.create('GeoPatrimoine.view.Viewport');
-                    var windowLogin = Ext.create('GeoPatrimoine.view.user.WindowLogin');
-                    windowLogin.show();
+                    GeoPatrimoine.getApplication().getController('User').autoLogin();
+                   
+                    
                 }
             }
             );
