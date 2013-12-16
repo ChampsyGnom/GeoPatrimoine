@@ -36,7 +36,32 @@ Ext.define('GeoPatrimoine.model.user.User', {
             source: 'database',
             output: 'json',
             schemaName: 'public',
-            tableName:'user'
+            tableName: 'user',
+            childTables: Ext.JSON.encode( [
+                {
+                    tableName: 'user_profil',
+                    childTables : [
+                    
+                                {
+                                    tableName: 'profil',
+                                    childTables: [
+                                        /*
+                                        {
+                                            tableName: 'profil_permission',
+                                            childTables: [
+                                                 {
+                                                     tableName: 'permission',
+                                                     childTables: [
+                                                     ]
+                                                 }
+                                            ]
+                                        }
+                                        */
+                                ]
+                        } 
+                    ]
+                }
+            ])
         },
         reader: {
             type: 'json',

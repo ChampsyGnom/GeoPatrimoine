@@ -106,10 +106,126 @@ class RestDatabaseSource extends RestAbstractSource
                  }
             }
         }
+        $childTableArray = null;
+         if (isset($_GET["childTables"]))
+        {
+            $childTableArray = json_decode($_GET["childTables"]);
+        }
+        if ($childTableArray !== null)
+        {
+          $rows["rows"] = $this->RecurseLoadChildTable($schemaName,$tableName,$rows["rows"],$childTableArray);
+        }
+        
+        
         
         $datas["rows"] = $rows["rows"];
         return $datas;
         
+     }
+      function RecurseLoadChildTable($schemaName,$tableName,$rows , $childTablesObjects)
+      {
+         foreach ($rows as &$row) 
+        {
+            foreach ($childTablesObjects as &$childTablesObject) 
+            {
+                $childTable = get_object_vars($childTablesObject);
+               
+                if (isset($childTable["tableName"]))
+                {
+                    $whereJoin = $this->GetWhereJoin($schemaName,$tableName,$childTable["tableName"],$format);
+                    $childTableColumns = $this->GetColumnInfos($schemaName,$childTable["tableName"],$format);
+                    $childTableSelectExpressions = [];
+                    $whereParent = $this->GetPrimaryKeyWhereFromValues($schemaName,$tableName,$row,$format);
+                    foreach ($childTableColumns as &$childTableColumn) 
+                    {
+                        $selectExpression = $this->GetSelectExpression($schemaName,$childTable["tableName"],$childTableColumn);
+                        array_push($childTableSelectExpressions,$selectExpression);
+                    }
+                    $sql = "SELECT ".implode(",",$childTableSelectExpressions)." FROM ".$schemaName.".".$childTable["tableName"].",".$schemaName.".".$tableName." WHERE ".$whereJoin." AND ".$whereParent;
+                   
+                    $result = $this->FetchAllRows($sql);
+                  
+                    $childRows = $result["rows"];
+                   
+                    if (isset($childTable["childTables"]))
+                    {
+                       
+                        $subChildTablesObjects =  $childTable["childTables"];
+                        $childRows = $this->RecurseLoadChildTable($schemaName,$childTable["tableName"],$childRows,$subChildTablesObjects,$format);
+                    }
+                     $row[$childTable["tableName"]."s"] = $childRows;
+                }
+            }
+        }
+        return $rows;
+    }
+    function GetPrimaryKeyWhereFromValues($schema,$table,$values)
+    {
+        $sql = "select ";
+        $sql .= "a.attname as column_name ";
+        $sql .= "from ";
+        $sql .= "pg_class t ";
+        $sql .= "join pg_attribute a on a.attrelid = t.oid ";
+        $sql .= "join pg_index ix    on t.oid = ix.indrelid AND a.attnum = ANY(ix.indkey) ";
+        $sql .= "join pg_class i     on i.oid = ix.indexrelid ";
+        $sql .= "left join pg_attrdef d on d.adrelid = t.oid and d.adnum = a.attnum   ";
+        $sql .= "where ";
+        $sql .= "t.relkind = 'r' ";
+        $sql .= "and t.relname in ( '".$table."' ) ";
+        $sql .= "order by ";
+        $sql .= "t.relname, ";
+        $sql .= "i.relname, ";
+        $sql .= "a.attnum; ";
+        $result = $this->FetchAllRows($sql);       
+        $rows = $result["rows"];
+        $wheres = [];
+        foreach ($rows as &$row) 
+        {
+            $columnName = $row["column_name"];
+            if (isset($values[$columnName]))
+            {
+                $where = $schema.".".$table.".".$columnName."=".$values[$columnName];
+                array_push($wheres,$where);
+            }
+        }
+        return implode(" AND ",$wheres);
+    }
+    function GetWhereJoin($schema,$parentTable,$childTable)
+    {
+        $sql = "SELECT ";
+        $sql .= "tc.constraint_name, tc.table_name, kcu.column_name, ";
+        $sql .= "ccu.table_name AS foreign_table_name, ";
+        $sql .= "ccu.column_name AS foreign_column_name ";
+        $sql .= "FROM ";
+        $sql .= "information_schema.table_constraints AS tc ";
+        $sql .= "JOIN information_schema.key_column_usage AS kcu ";
+        $sql .= "ON tc.constraint_name = kcu.constraint_name ";
+        $sql .= "JOIN information_schema.constraint_column_usage AS ccu ";
+        $sql .= "ON ccu.constraint_name = tc.constraint_name ";
+        $sql .= "WHERE constraint_type = 'FOREIGN KEY' ";
+        $sql .= "AND tc.table_name='".$childTable."' ";
+        $sql .= "and ccu.table_name='".$parentTable."'";
+        $result = $this->FetchAllRows($sql);
+        
+        $rows = $result["rows"];
+        $wheres = [];
+        foreach ($rows as &$row) 
+        {
+            $where = $schema.".".$parentTable.".".$row["foreign_column_name"]."=".$schema.".".$childTable.".".$row["column_name"];
+            array_push($wheres,$where);
+        }
+        return implode(" AND ",$wheres);
+    }
+    
+    
+     function RecurseAddChildTables($array)
+     {
+       for($i = 0 ; $i < count($array);$i++)
+       {
+          $vars = get_object_vars($array[$i]);
+          echo "table ".$vars["name"];
+          $this->RecurseAddChildTables($vars["childTables"]);
+       }
      }
      function GetWhereExpression($schemaName,$tableName,$column,$operator,$value)
      {
@@ -131,7 +247,8 @@ class RestDatabaseSource extends RestAbstractSource
      }
     function FetchAllRows($sql)
     {
-        $resultInfo = [];        
+        $resultInfo = [];    
+       
         try 
         {
            $rows =[];
@@ -145,6 +262,7 @@ class RestDatabaseSource extends RestAbstractSource
         } 
         catch (Exception $e) 
         {           
+          
            throw new Exception('Erreur durant l\'éxécution de la requête '.$sql);
         }
       
