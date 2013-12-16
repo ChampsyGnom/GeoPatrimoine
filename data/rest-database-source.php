@@ -49,8 +49,7 @@ class RestDatabaseSource extends RestAbstractSource
      }
      function Login()
      {
-        $this->Connect();
-        $sql = "select ";
+      
      }
  }
 
