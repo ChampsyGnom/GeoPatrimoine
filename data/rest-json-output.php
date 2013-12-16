@@ -14,7 +14,11 @@ class RestJsonOutput extends RestAbstractOutput
      
     function Write($datas)
     {
-        echo json_encode($datas);
+        $json = [];
+        $json["success"] = true;
+        $json["total"] = $datas["total"];
+        $json["datas"] = $datas["rows"];
+        echo json_encode($json);
     }
      
  }

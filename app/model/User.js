@@ -19,7 +19,9 @@ Ext.define('GeoPatrimoine.model.User', {
         url: './data/rest-service.php',
         extraParams: {
             source: 'database',
-            output:'json'
+            output: 'json',
+            schemaName: 'public',
+            tableName:'user'
         },
         reader: {
             type: 'json',

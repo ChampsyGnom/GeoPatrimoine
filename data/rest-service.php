@@ -9,6 +9,9 @@ try {
     $RestApi = new RestApi($_REQUEST['request'], $_SERVER['HTTP_ORIGIN']);
     $RestApi->processAPI();
 } catch (Exception $e) {
-    echo json_encode(Array('error' => $e->getMessage()));
+    $json = [];
+    $json["success"] = false;
+    $json["error" ] =  $e->getMessage();    
+    echo json_encode($json);
 }
 ?>
