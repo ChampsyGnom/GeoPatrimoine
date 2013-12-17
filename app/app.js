@@ -10,10 +10,12 @@ Ext.application({
         'GeoPatrimoine.view.search.PanelSearch',        
         'GeoPatrimoine.view.template.PanelTemplateTree',
         'GeoPatrimoine.view.template.PanelTemplateList',
-        'GeoPatrimoine.view.template.WindowTemplate'
+        'GeoPatrimoine.view.template.WindowTemplate',
+        'GeoPatrimoine.view.search.FieldGoogleLocationSearch',
+        'GeoPatrimoine.view.template.WindowFolder'
     ],
-    models: ['lang.Lang', 'lang.LangResource', 'user.User'],
-    stores: ['GeoPatrimoine.store.LangResource', 'User'],
+    models: ['lang.Lang', 'lang.LangResource', 'user.User','template.Template','template.Node','template.NodeType','Param','style.Style','style.Rule','style.Label'],
+    stores: ['GeoPatrimoine.store.LangResource', 'User', 'Template'],
     controllers: ['User','Template'],
     init: function (application) {
         console.log("init");
@@ -23,6 +25,7 @@ Ext.application({
     ,
     launch: function ()
     {
+        GeoPatrimoine.template = null;
         GeoPatrimoine.updateAdminComponentsVisibility = function () {
             var adminComponents = Ext.ComponentQuery.query("[isNonAdminHidden=true]");
             var funcSetVisibility = null;

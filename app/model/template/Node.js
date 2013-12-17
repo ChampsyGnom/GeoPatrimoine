@@ -1,5 +1,5 @@
-Ext.define('eCarto.model.Node', {
-    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'eCarto.model.Param'],
+Ext.define('GeoPatrimoine.model.template.Node', {
+    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.Param'],
     extend: 'Ext.data.Model',
     idProperty: 'id',
     fields: [
@@ -42,7 +42,7 @@ Ext.define('eCarto.model.Node', {
            primaryKey: 'id',
            associationKey: 'params',
            name: 'params',
-           model: 'eCarto.model.Param'
+           model: 'GeoPatrimoine.model.Param'
        },
          {
              type: 'hasMany',
@@ -50,7 +50,7 @@ Ext.define('eCarto.model.Node', {
              primaryKey: 'id',
              associationKey: 'styles',
              name: 'styles',
-             model: 'eCarto.model.Style'
+             model: 'GeoPatrimoine.model.style.Style'
          }
     ],
     proxy:
@@ -63,15 +63,17 @@ Ext.define('eCarto.model.Node', {
         noCache: false,
         appendId : false,
         type: 'rest',
-        url: './data/rest.php',
+        url: './data/rest-service.php',
         extraParams: {
             schemaName: 'public',
             tableName: 'node',
+            source: 'database',
+            output: 'json',
             childTables: Ext.JSON.encode([])
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.Node',
+            model: 'GeoPatrimoine.model.template.Node',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

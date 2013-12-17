@@ -1,4 +1,4 @@
-Ext.define('eCarto.model.Label', {
+Ext.define('GeoPatrimoine.model.style.Label', {
     extend: 'Ext.data.Model',
     requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
     idProperty: 'id',
@@ -52,7 +52,7 @@ Ext.define('eCarto.model.Label', {
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.Label',
+            model: 'GeoPatrimoine.model.style.Label',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

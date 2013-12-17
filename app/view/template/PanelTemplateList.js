@@ -12,7 +12,20 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateList', {
             xtype: 'combo',
             itemId:'combo-template',
             margin: 2,
-            flex: 1
+            queryMode:'local',
+            flex: 1,
+            store: 'Template',
+            valueField: 'id',
+            editable:false,
+            displayField: 'display_name',
+            listeners: {
+                change: function ( combo, newValue, oldValue, eOpts )
+                {
+                    var combo = this.up("paneltemplatelist").down("combo");
+                    var record = combo.getStore().findRecord("id", combo.getValue());
+                    GeoPatrimoine.getApplication().fireEvent('selectedTemplateChange', record);
+                }
+            }
         }
         ,
         {
@@ -24,7 +37,11 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateList', {
             isNonAdminHidden: true,
             disabled: false,
             hidden:true,
-            margin:2
+            margin: 2,
+            handler: function ()
+            {
+                this.up("paneltemplatelist").fireEvent('createTemplateClick');
+            }
         },
         {
 
@@ -35,7 +52,14 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateList', {
             isNonAdminHidden: true,
             disabled: true,
             hidden: true,
-            margin:2
+            margin: 2,
+            handler: function () {
+                var combo = this.up("paneltemplatelist").down("combo");
+                var record = combo.getStore().findRecord("id", combo.getValue());
+                if (record !== null)
+                { this.up("paneltemplatelist").fireEvent('updateTemplateClick', record); }
+               
+            }
         }
         ,
         {
@@ -47,9 +71,14 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateList', {
             isNonAdminHidden: true,
             disabled: true,
             hidden: true,
-            margin: 2
+            margin: 2,
+            handler: function () {
+                var combo = this.up("paneltemplatelist").down("combo");
+                var record = combo.getStore().findRecord("id", combo.getValue());
+                if (record !== null)
+                { this.up("paneltemplatelist").fireEvent('deleteTemplateClick', record); }
+            }
         }
-        
         
 
         ];

@@ -24,6 +24,7 @@ Ext.define('GeoPatrimoine.controller.User', {
         GeoPatrimoine.user = null;
         GeoPatrimoine.updateAdminComponentsVisibility();
         this.autoLogin();
+        GeoPatrimoine.getApplication().fireEvent('userUnlogged');
 
     },
     onWindowLoginButtonOkClick: function (button) {
@@ -44,7 +45,15 @@ Ext.define('GeoPatrimoine.controller.User', {
             me.getTxtUserName().setText(GeoPatrimoine.user.data.first_name + ' ' + GeoPatrimoine.user.data.name);
             GeoPatrimoine.updateAdminComponentsVisibility();
             windowLogin.close();
-            me.getMainPanel().show();
+            var templateStore = Ext.data.StoreManager.lookup('Template');
+            templateStore.load({
+                callback: function () {
+                    me.getMainPanel().show();
+                    GeoPatrimoine.getApplication().fireEvent('userLogged');
+                }
+            });
+            
+           
         }, function () {
 
 
@@ -61,7 +70,13 @@ Ext.define('GeoPatrimoine.controller.User', {
                 GeoPatrimoine.user = user;
                 me.getTxtUserName().setText(GeoPatrimoine.user.data.first_name + ' ' + GeoPatrimoine.user.data.name);
                 GeoPatrimoine.updateAdminComponentsVisibility();
-                me.getMainPanel().show();
+                var templateStore = Ext.data.StoreManager.lookup('Template');
+                templateStore.load({
+                    callback: function () {
+                        me.getMainPanel().show();
+                        GeoPatrimoine.getApplication().fireEvent('userLogged');
+                    }
+                });
             }, function () {
 
                 windowLogin = Ext.create('GeoPatrimoine.view.user.WindowLogin');

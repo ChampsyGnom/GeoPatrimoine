@@ -1,4 +1,4 @@
-Ext.define('eCarto.model.Param', {
+Ext.define('GeoPatrimoine.model.Param', {
     extend: 'Ext.data.Model',
     idProperty: 'id',
     requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
@@ -26,7 +26,7 @@ Ext.define('eCarto.model.Param', {
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.Param',
+            model: 'GeoPatrimoine.model.Param',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

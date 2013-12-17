@@ -4,6 +4,7 @@ Ext.define('GeoPatrimoine.view.Viewport', {
    
     initComponent: function ()
     {
+       
         this.items = [
            {
                xtype: 'panelheader',

@@ -1,4 +1,4 @@
-Ext.define('eCarto.model.Preference', {
+Ext.define('GeoPatrimoine.model.user.Preference', {
     extend: 'Ext.data.Model',
     idProperty: 'id',
     requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
@@ -9,18 +9,7 @@ Ext.define('eCarto.model.Preference', {
          { name: 'user__id', type: 'int', mapping: 'user__id' },
          { name: 'node__id', type: 'int', mapping: 'node__id' ,useNull :true}
     ],
-    /*
-    associations: [
-
-        {
-            type: 'hasMany',
-            foreignKey: 'style__id',
-            primaryKey: 'id',
-            associationKey: 'rules',
-            name: 'rules',
-            model: 'MAP.model.Rule'
-        }
-    ],*/
+  
     proxy:
     {
         pageParam: false,
@@ -31,8 +20,10 @@ Ext.define('eCarto.model.Preference', {
         batchOrder: 'destroy,create,update',
         noCache: false,
         type: 'rest',
-        url: './data/rest.php',
+        url: './data/rest-service.php',
         extraParams: {
+            source: 'database',
+            output: 'json',
             schemaName: 'public',
             tableName: 'preference',
             childTables: Ext.JSON.encode(
@@ -44,7 +35,7 @@ Ext.define('eCarto.model.Preference', {
 
         reader: {
             type: 'json',
-            model: 'MAP.model.Preference',
+            model: 'GeoPatrimoine.model.user.Preference',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

@@ -1,4 +1,4 @@
-Ext.define('eCarto.model.NodeType', {
+Ext.define('GeoPatrimoine.model.template.NodeType', {
     idProperty: 'id',
     extend: 'Ext.data.Model',
     fields: [
@@ -24,7 +24,7 @@ Ext.define('eCarto.model.NodeType', {
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.NodeType',
+            model: 'GeoPatrimoine.model.template.NodeType',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

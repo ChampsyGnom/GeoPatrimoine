@@ -1,7 +1,7 @@
-Ext.define('eCarto.model.Style', {
+Ext.define('GeoPatrimoine.model.style.Style', {
     extend: 'Ext.data.Model',
     idProperty: 'id',
-    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'eCarto.model.Rule', 'eCarto.model.Label'],
+    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.style.Rule', 'GeoPatrimoine.model.style.Label'],
     fields: [
          { name: 'id', type: 'int', mapping: 'id', useNull: true, defaultValue: -1 },
          { name: 'node__id', type: 'int', mapping: 'node__id' },
@@ -20,7 +20,7 @@ Ext.define('eCarto.model.Style', {
             primaryKey: 'id',
             associationKey: 'rules',
             name: 'rules',
-            model: 'eCarto.model.Rule'
+            model: 'GeoPatrimoine.model.style.Rule'
         },
          {
              type: 'hasMany',
@@ -28,7 +28,7 @@ Ext.define('eCarto.model.Style', {
              primaryKey: 'id',
              associationKey: 'labels',
              name: 'labels',
-             model: 'eCarto.model.Label'
+             model: 'GeoPatrimoine.model.style.Label'
          }
     ],
     proxy:
@@ -58,7 +58,7 @@ Ext.define('eCarto.model.Style', {
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.Style',
+            model: 'GeoPatrimoine.model.style.Style',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',

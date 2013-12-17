@@ -1,7 +1,6 @@
 Ext.define('GeoPatrimoine.model.user.User', {
     extend: 'Ext.data.Model',
-    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.user.Profil'
-    ],
+    requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo', 'GeoPatrimoine.model.user.Profil','GeoPatrimoine.model.user.Preference'],
     idProperty: 'id',  
     fields: [
          { name: 'id', type: 'int', mapping: 'id', useNull: true, defaultValue: null },
@@ -35,8 +34,17 @@ Ext.define('GeoPatrimoine.model.user.User', {
           associationKey: 'profils',
           name: 'profils',
           model: 'GeoPatrimoine.model.user.Profil'
-      }
-       
+      },
+       {
+           type: 'hasMany',
+           foreignKey: 'user__id',
+           primaryKey: 'id',
+           associationKey: 'preferences',
+           name: 'preferences',
+           model: 'GeoPatrimoine.model.user.Preference'
+       }
+
+      
     ],
     proxy:
     {
@@ -63,7 +71,15 @@ Ext.define('GeoPatrimoine.model.user.User', {
 
                             ]
                         }
+                        
                                 
+                    ]
+                },
+                {
+                    tableName: 'preference',
+                    childTables: [
+
+
                     ]
                 }
             ])
@@ -78,5 +94,42 @@ Ext.define('GeoPatrimoine.model.user.User', {
             messageProperty: 'message'
 
         }
+    },
+    setPreferenceValue: function (nodeId, property, value, autoSync) {
+        var item = null;
+        this.preferences().getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+        this.preferences().each(function (prfItem) {
+            if (prfItem.data.user__id === GeoPatrimoine.user.data.id
+                && prfItem.data.node__id === nodeId
+                && prfItem.data.property === property) {
+                item = prfItem;
+            }
+        });
+        if (item === null) {
+            item = Ext.create('GeoPatrimoine.model.user.Preference');
+            item.data.user__id = GeoPatrimoine.user.data.id;
+            item.data.node__id = nodeId;
+            item.data.property = property;
+            item.data.value = value;
+            this.preferences().add(item);
+        }
+        else {
+            item.data.value = value;
+            item.setDirty();
+        }
+        if (autoSync === true)
+        { this.preferences().sync(); }
+
+    },
+    getPreferenceValue: function (nodeId, property) {
+        var value = null;
+        this.preferences().each(function (prfItem) {
+            if (prfItem.data.user__id === GeoPatrimoine.user.data.id
+                && prfItem.data.node__id === nodeId
+                && prfItem.data.property === property) {
+                value = prfItem.data.value;
+            }
+        });
+        return value;
     }
 });

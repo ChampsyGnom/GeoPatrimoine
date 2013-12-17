@@ -67,7 +67,7 @@ abstract class RestAbstractApi
             break;
         case 'PUT':
             $this->request = $this->_cleanInputs($_GET);
-            $this->file = file_get_contents("php://input");
+          //  $this->file = file_get_contents("php://input");
             break;
         default:
             $this->_response('Invalid Method', 405);
@@ -84,7 +84,7 @@ abstract class RestAbstractApi
     }
 
     private function _response($data, $status = 200) {
-        header("HTTP/1.1 " . $status . " " . $this->_requestStatus($status));
+        //header("HTTP/1.1 " . $status . " " . $this->_requestStatus($status));
         return json_encode($data);
     }
 

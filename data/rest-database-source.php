@@ -11,11 +11,216 @@ class RestDatabaseSource extends RestAbstractSource
         parent::__construct($api);
         
     }
-    
+    function ValidateToken($array)
+    {
+        if (isset($array["token"]))
+        {
+            if (isset($_SESSION['token']))
+            {
+                if ($array["token"] !== $_SESSION['token'])
+                { throw new Exception('Jeton invalide');}
+            }
+            else
+            { throw new Exception('Session jeton manquant');}
+        }
+        else
+        { throw new Exception('Paramètre jeton manquant');}
+        
+    }
+    function Update()
+    {
+        $this->ValidateToken($_GET);
+        $datas = [];
+        $content = file_get_contents('php://input');
+        $datas = get_object_vars(json_decode( $content));          
+        $schemaName = $this->GetParameterString($_GET,'schemaName');
+        $tableName= $this->GetParameterString($_GET,'tableName');
+        $this->Connect();
+        $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
+        $whereExpressions = [];
+        $updateExpressions = [];
+         for($i = 0 ;$i < count($tableColumns);$i++)
+         {
+            foreach ($datas as $key => $value)
+            {
+                if ($key === $tableColumns[$i]['name'])
+                {
+                    if ($tableColumns[$i]["dataType"] === 'serial')
+                    {
+                        $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
+                        array_push($whereExpressions,$whereExpression);
+                    }
+                    else
+                    {
+                        $updateExpression = $this->GetUpdateExpression($schemaName,$tableName,$tableColumns[$i],$value);
+                        array_push($updateExpressions,$updateExpression);
+                    }
+                   
+                }
+            }
+            
+        }
+        $sql = "update ".$schemaName.".".$tableName." set ".implode(",",$updateExpressions)." where ".implode(" and ",$whereExpressions);       
+        $result = pg_query($this->connection, $sql);   
+        
+        $this->Disconnect();
+        
+        $datas = [];
+        $datas["rows"] = [];
+        $datas["total"] =0;
+        return $datas;
+      
+    }
+    function GetUpdateExpression($schemaName,$tableName,$column,$value)
+    {
+        if ($value === null || $value === '') return $column["name"]."="."null";
+        if ($column["dataType"] === 'integer')
+        {
+            return $column["name"]."=".$this->ToSqlNumber($value);
+        }
+        else if ($column["dataType"] === 'text')
+        {
+            return $column["name"]."=".$this->ToSqlString($value);
+        } 
+        else if ($column["dataType"] === 'float')
+        {
+            return $column["name"]."=".$this->ToSqlNumber($value);
+        }
+    }
+    function Delete()
+    {
+        $this->ValidateToken($_GET);
+        $datas = [];
+        $content = file_get_contents('php://input');
+        $datas = get_object_vars(json_decode( $content));     
+        $schemaName = $this->GetParameterString($_GET,'schemaName');
+        $tableName= $this->GetParameterString($_GET,'tableName');
+        $this->Connect();
+        $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
+        $whereExpressions = [];
+        for($i = 0 ;$i < count($tableColumns);$i++)
+        {
+            if ($tableColumns[$i]["dataType"] === 'serial')
+            {
+               foreach ($datas as $key => $value)
+               {
+                    if ($key === $tableColumns[$i]['name'])
+                    {
+                        $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
+                        array_push($whereExpressions,$whereExpression);
+                    }
+               }
+            }
+        }
+        $sql = "delete from ".$schemaName.".".$tableName." where ".implode(" or ",$whereExpressions);
+        $result = pg_query($this->connection, $sql);   
+        $this->Disconnect();
+        $datas = [];
+        $datas["rows"] = [];
+        $datas["total"] =0;
+        return $datas;
+    }
+    function Insert()
+    {
+        $this->ValidateToken($_GET);
+        $datas = [];
+        $content = file_get_contents('php://input');
+        $datas = get_object_vars(json_decode( $content));     
+        $schemaName = $this->GetParameterString($_GET,'schemaName');
+        $tableName= $this->GetParameterString($_GET,'tableName');
+        $this->Connect();
+        $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
+        $sqlInsertColumns = [];
+        $sqlInsertValues = [];
+        $resultDataWheres = [];
+        for($i = 0 ;$i < count($tableColumns);$i++)
+        {
+            $resultDataIds = [];
+            $value = null;
+            if (isset($datas[$tableColumns[$i]["name"]]))
+            {   
+                $value = $datas[$tableColumns[$i]["name"]];
+            }
+           
+            $sqlInsertValue = $this->GetInsertExpression($schemaName,$tableName,$tableColumns[$i],$value);
+            if ($sqlInsertValue !== null)
+            {
+                array_push($sqlInsertColumns,$tableColumns[$i]["name"]);
+                array_push($sqlInsertValues,$sqlInsertValue);
+              
+                if ($tableColumns[$i]["dataType"] === 'serial')
+                {
+                     
+                   $resultDataWhere =  $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$sqlInsertValue);                  
+                   array_push($resultDataWheres,$resultDataWhere);
+                }
+            }
+        }
+        $sql = "insert into ".$schemaName.".".$tableName." (".implode(",",$sqlInsertColumns).") values (".implode(",",$sqlInsertValues).")";
+        $result = pg_query($this->connection, $sql);   
+        if ($result !== false)
+        {
+            $sqlSelectExpressions = [];
+            for($i = 0 ;$i < count($tableColumns);$i++)
+            {
+                $sqlSelectExpression = $this->GetSelectExpression($schemaName,$tableName,$tableColumns[$i]);
+                array_push($sqlSelectExpressions,$sqlSelectExpression);
+            }
+            $sql = "select ".implode(",",$sqlSelectExpressions)." from ".$schemaName.".".$tableName." where ".implode(' or ',$resultDataWheres);
+            $rows = $this->FetchAllRows($sql);  
+            
+            $datas["rows"] = $rows["rows"];
+            $datas["total"] =count($rows["rows"]);
      
+        
+        }
+        $this->Disconnect();
+       return $datas;
+    }
+     function GetInsertExpression($schemaName,$tableName,$column,$value)
+     {
+        $exp = null;
+        if ($column["dataType"] === 'serial')
+        {
+            $sql = "select nextval('".$tableName."_".$column["name"]."_seq') as id";
+            $rows = $this->FetchAllRows($sql);     
+            $exp = $rows["rows"][0]["id"];
+        }
+        else if ($value === '' || $value === null)
+        {
+            return "null";
+        }
+        else if ($column["dataType"] === 'integer')
+        {
+            
+            $exp =  $this->ToSqlNumber($value);
+        }
+        else if ($column["dataType"] === 'float')
+        {
+             $exp =  $this->ToSqlNumber($value);
+        }
+        else if ($column["dataType"] === 'text')
+        {
+             $exp =  $this->ToSqlString($value);
+        }
+        else if ($column["dataType"] === 'boolean')
+        {
+        
+        }
+         else if ($column["dataType"] === 'date')
+        {
+        
+        }
+         else if ($column["dataType"] === 'timestamp')
+        {
+        }
+      
+        return $exp;
+       
+     }
      function Select() 
      {
-     
+       
         $isLogin = $this->GetParameterBooleanOrDefault($_GET,'isLogin',false);	  
         $schemaName = $this->GetParameterString($_GET,'schemaName');
         $tableName= $this->GetParameterString($_GET,'tableName');
@@ -105,6 +310,8 @@ class RestDatabaseSource extends RestAbstractSource
                     
                  }
             }
+            else
+            {$this->ValidateToken($_GET);}
         }
         $childTableArray = null;
          if (isset($_GET["childTables"]))
@@ -119,6 +326,7 @@ class RestDatabaseSource extends RestAbstractSource
         
         
         $datas["rows"] = $rows["rows"];
+        $this->Disconnect();
         return $datas;
         
      }
@@ -328,6 +536,13 @@ class RestDatabaseSource extends RestAbstractSource
             {return $schemaName.".".$tableName.".".$column["name"]." = ".$this->ToSqlString($value);}
      
         }
+        if ($column["dataType"] === 'serial')
+        {
+            if ($operator === '=')
+            {
+                return $schemaName.".".$tableName.".".$column["name"]." = ".$this->ToSqlNumber($value);
+            }
+        }
         return null;
      }
      function GetSelectExpression($schemaName,$tableName,$column)
@@ -361,6 +576,10 @@ class RestDatabaseSource extends RestAbstractSource
      function ToSqlString($value)
      {
         return "'".str_replace("'","''",$value)."'";
+     }
+      function ToSqlNumber($value)
+     {
+        return str_replace(",",".",$value);
      }
      function GetColumnInfos($schemaName,$tableName)
      {
@@ -486,7 +705,10 @@ class RestDatabaseSource extends RestAbstractSource
         }
         return $columns;
      }
-     
+     function Disconnect()
+     {
+         pg_close ($this->connection);
+     }
      function Connect()
      {
         $this->databaseConfigurations = parse_ini_file("./database.ini", $process_sections = true);

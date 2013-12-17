@@ -23,3 +23,37 @@
     font-weight: bold;
     margin: 0px 14px 0px 0px;
 }
+
+.menu-folder-edit
+{
+    background-image: url(./icons/16x16/folder-edit.png) !important;
+}
+
+.menu-folder-add
+{
+    background-image: url(./icons/16x16/folder-add.png) !important;
+}
+
+.menu-folder-delete 
+{
+    background-image: url(./icons/16x16/folder-delete.png) !important;
+}
+
+.menu-layer-add
+{
+    background-image: url(./icons/16x16/layer-add.png) !important;
+}
+
+.menu-layer-order
+{
+    background-image: url(./icons/16x16/layer-order.png) !important;
+}
+.menu-layer-edit 
+{
+    background-image: url(./icons/16x16/layer-edit.png) !important;
+}
+
+.menu-layer-delete 
+{
+    background-image: url(./icons/16x16/layer-delete.png) !important;
+}

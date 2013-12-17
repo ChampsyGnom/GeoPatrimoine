@@ -1,4 +1,4 @@
-Ext.define('eCarto.model.Rule', {
+Ext.define('GeoPatrimoine.model.style.Rule', {
     extend: 'Ext.data.Model',
     idProperty: 'id',
     requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
@@ -124,7 +124,7 @@ Ext.define('eCarto.model.Rule', {
         },
         reader: {
             type: 'json',
-            model: 'eCarto.model.Rule',
+            model: 'GeoPatrimoine.model.style.Rule',
             root: 'datas',
             idProperty: 'id',
             totalProperty: 'total',
