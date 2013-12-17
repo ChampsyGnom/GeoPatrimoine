@@ -7,7 +7,7 @@ Ext.define('GeoPatrimoine.controller.User', {
     }, {
         ref: 'TxtUserName',
         selector: 'viewport panelheader #txt-user-name'
-    }],  
+    }],
     init: function () {
 
         this.control(
@@ -17,8 +17,7 @@ Ext.define('GeoPatrimoine.controller.User', {
            }
        );
     },
-    onPanelHeaderButtonDisconnectClick: function ()
-    {
+    onPanelHeaderButtonDisconnectClick: function () {
         Ext.util.Cookies.clear('user');
         Ext.util.Cookies.clear('password');
         this.getTxtUserName().setText("Non authentifié");
@@ -39,7 +38,7 @@ Ext.define('GeoPatrimoine.controller.User', {
                 var expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
                 Ext.util.Cookies.set('user', valuesLogin.user_name, expiry);
                 Ext.util.Cookies.set('password', md5Password, expiry);
-                
+
             }
             GeoPatrimoine.user = user;
             me.getTxtUserName().setText(GeoPatrimoine.user.data.first_name + ' ' + GeoPatrimoine.user.data.name);
@@ -47,13 +46,12 @@ Ext.define('GeoPatrimoine.controller.User', {
             windowLogin.close();
             me.getMainPanel().show();
         }, function () {
-            
-           
+
+
         });
 
     },
-    autoLogin: function ()
-    {
+    autoLogin: function () {
         var me = this;
         var windowLogin;
         var cookieUser = Ext.util.Cookies.get('user');
@@ -65,23 +63,21 @@ Ext.define('GeoPatrimoine.controller.User', {
                 GeoPatrimoine.updateAdminComponentsVisibility();
                 me.getMainPanel().show();
             }, function () {
-              
+
                 windowLogin = Ext.create('GeoPatrimoine.view.user.WindowLogin');
                 windowLogin.show();
                 me.getMainPanel().hide();
 
             });
         }
-        else
-        {
+        else {
             me.getMainPanel().hide();
             windowLogin = Ext.create('GeoPatrimoine.view.user.WindowLogin');
             windowLogin.show();
         }
     },
-   
-    login: function (login, password,successCallback,failureCallback)
-    {
+
+    login: function (login, password, successCallback, failureCallback) {
         var me = this;
         var storeUser = Ext.data.StoreManager.lookup('User');
         storeUser.clearFilter();
@@ -93,25 +89,25 @@ Ext.define('GeoPatrimoine.controller.User', {
         storeUser.addFilter([
           {
               property: 'password',
-              value: 'md5_'+ password
+              value: 'md5_' + password
           }]);
-     
+
         storeUser.load(
         {
-            callback: function(records, operation, success) {                
+            callback: function (records, operation, success) {
                 if (success && records.length === 1) {
-                   
+
                     successCallback(records[0]);
                 }
                 else {
-                    var win =  Ext.Msg.show({
+                    var win = Ext.Msg.show({
                         title: GeoPatrimoine.lang.WindowLoginErrorAuthentificationMessageTitle,
                         msg: GeoPatrimoine.lang.WindowLoginErrorAuthentificationMessageContent,
                         buttons: Ext.Msg.OK
                     });
-                     
+
                     failureCallback();
-                   
+
                 }
             }
         });

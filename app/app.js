@@ -9,11 +9,12 @@ Ext.application({
         'GeoPatrimoine.view.map.PanelMap',
         'GeoPatrimoine.view.search.PanelSearch',        
         'GeoPatrimoine.view.template.PanelTemplateTree',
-        'GeoPatrimoine.view.template.PanelTemplateList'
+        'GeoPatrimoine.view.template.PanelTemplateList',
+        'GeoPatrimoine.view.template.WindowTemplate'
     ],
     models: ['lang.Lang', 'lang.LangResource', 'user.User'],
     stores: ['GeoPatrimoine.store.LangResource', 'User'],
-    controllers: ['User'],
+    controllers: ['User','Template'],
     init: function (application) {
         console.log("init");
      
