@@ -14,7 +14,7 @@ Ext.define('GeoPatrimoine.store.User', {
             if (successful && records.length === 1)
             {
                 var record = records[0];
-                console.log("Nombre de préférence " + record.preferences().getCount());
+                console.log("Nombre de preference " + record.preferences().getCount());
               
             }
             

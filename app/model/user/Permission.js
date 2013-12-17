@@ -1,4 +1,4 @@
-﻿Ext.define('GeoPatrimoine.model.user.Permission', {
+Ext.define('GeoPatrimoine.model.user.Permission', {
     requires: ['Ext.data.association.HasMany', 'Ext.data.association.BelongsTo'],
     extend: 'Ext.data.Model',
     idProperty: 'id',

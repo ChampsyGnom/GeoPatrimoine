@@ -19,7 +19,7 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateList', {
             editable:false,
             displayField: 'display_name',
             listeners: {
-                change: function ( combo, newValue, oldValue, eOpts )
+                change: function ( control, newValue, oldValue, eOpts )
                 {
                     var combo = this.up("paneltemplatelist").down("combo");
                     var record = combo.getStore().findRecord("id", combo.getValue());

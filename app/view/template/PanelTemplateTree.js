@@ -4,10 +4,51 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
     layout:'fit',
     items: [
         {
+
             xtype: 'treepanel',
+            
+            viewConfig: {              
+             
+                plugins: {
+                    allowContainerDrops: true,
+                    ptype: 'treeviewdragdrop'              
+                    
+                   
+                },
+                listeners: {
+                    drop: function (node, data, overModel, dropPosition) {
+                        
+                    },
+                    notifyDrop: function (dragSource, event, data) {
+                        console.log(dragSource);
+                    },
+                    notifyOver: function (dragSource, event, data) {
+                        console.log(dragSource);
+                    },
+                    beforedrop: function (node, data, overModel, dropPosition, dropHandlers, eOpts) {
+                        return true;
+
+                    }
+                }
+            },
             rootVisible:false,
             listeners:
             {
+                itemcollapse : function( treeNode, eOpts )
+                {
+                    if (GeoPatrimoine.user !== undefined && GeoPatrimoine.user !== null)
+                    {
+                        GeoPatrimoine.user.setPreferenceValue(treeNode.data.itemId, "expanded", "false", false);
+                        GeoPatrimoine.user.preferences().sync();
+                    }
+                },
+                itemexpand: function (treeNode, eOpts)
+                {
+                    if (GeoPatrimoine.user !== undefined && GeoPatrimoine.user !== null) {
+                        GeoPatrimoine.user.setPreferenceValue(treeNode.data.itemId, "expanded", "true", false);
+                        GeoPatrimoine.user.preferences().sync();
+                    }
+                },
                 containercontextmenu: function (tree, e, eOpts) {
                     e.stopEvent();
                     var panelTreeTemplate = tree.up("paneltemplatetree");
@@ -38,13 +79,14 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                 },
                 itemcontextmenu: function ( tree, record, item, index, e, eOpts ) {
                     e.stopEvent();
+                    var contextMenu = null;
                     var panelTreeTemplate = tree.up("paneltemplatetree");
                     var menuItems = [];
                     if (GeoPatrimoine.template !== null && GeoPatrimoine.user.isGeoPatrimoineAdministrator()) {
 
                       menuItems.push(
                       {
-                          text: 'Créer un sous-dossier',
+                          text: 'Creer un sous-dossier',
                           handler: function ()
                           { panelTreeTemplate.fireEvent('addFolderClick', record.data.itemId); },
                           iconCls: 'menu-folder-add'
@@ -65,7 +107,7 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                        });
 
 
-                        var contextMenu = new Ext.menu.Menu({
+                        contextMenu = new Ext.menu.Menu({
                             items: [
                                 {
                                     text: 'Nouveau dossier', handler: function () {
@@ -90,7 +132,7 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                     }
                     if (menuItems.length > 0)
                     {
-                        var contextMenu = new Ext.menu.Menu({
+                        contextMenu = new Ext.menu.Menu({
                             items: menuItems
                         });
                         contextMenu.showAt(e.getXY());
@@ -105,7 +147,8 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
 
         this.callParent(arguments);
         GeoPatrimoine.getApplication().on('selectedTemplateChange',this.onSelectedTemplateChange,this);
-        GeoPatrimoine.getApplication().on('templateHierarchyChange', this.onTemplateHierarchyChange,this);
+        GeoPatrimoine.getApplication().on('templateHierarchyChange', this.onTemplateHierarchyChange, this);
+        this.addEvents('editLayerOrderClick', 'addLayerClick', 'addFolderClick', 'deleteFolderClick', 'editFolderClick');
     },
     onSelectedTemplateChange: function ()
     {
@@ -126,16 +169,17 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
     recurseBuildTreeNodes: function (parentId,parentNode)
     {
         var me = this;
+        var node = null;
         if (GeoPatrimoine.template === null) return;
         GeoPatrimoine.template.nodes().each(function (item) {
             if (item.data.parent_id === parentId) {
                 if (item.data.node_type__id === 1) {
-                   // var expandedPref = eCarto.loggedUser.getPreferenceValue(item.data.id, 'expanded');
-                  //  var expanded = expandedPref === 'true';
-                    var node = parentNode.appendChild({
+                    var expandedPref = GeoPatrimoine.user.getPreferenceValue(item.data.id, 'expanded');
+                    var expanded = expandedPref === 'true';
+                     node = parentNode.appendChild({
                         text: item.data.display_name,
                         leaf: false,
-                        expanded: false
+                        expanded: expanded
 
                     });
                     node.data.itemId = item.data.id;
@@ -144,7 +188,7 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                 else {
                    // var checkedPref = eCarto.loggedUser.getPreferenceValue(item.data.id, 'checked');
                    // var checked = checkedPref === 'true';
-                    var node = parentNode.appendChild({
+                    node = parentNode.appendChild({
                         text: item.data.display_name,
                         leaf: true,
                         checked: false

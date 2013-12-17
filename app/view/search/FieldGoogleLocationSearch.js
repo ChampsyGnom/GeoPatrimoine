@@ -1,4 +1,4 @@
-﻿Ext.define('GeoPatrimoine.view.search.FieldGoogleLocationSearch', {
+Ext.define('GeoPatrimoine.view.search.FieldGoogleLocationSearch', {
     extend: 'Ext.form.FieldContainer',
     alias: 'widget.fieldgooglelocationsearch',
     height: 300,
@@ -39,7 +39,7 @@
                     selectionchange: function (view, selected, eOpts) {
                         var grid = view.view.ownerCt;
                         
-                        if (selected !== null && selected.length == 1) {
+                        if (selected !== null && selected.length === 1) {
                             var locationX = selected[0].raw.geometry.location.lng;
                             var locationY = selected[0].raw.geometry.location.lat;
 

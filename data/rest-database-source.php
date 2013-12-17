@@ -92,28 +92,47 @@ class RestDatabaseSource extends RestAbstractSource
         $this->ValidateToken($_GET);
         $datas = [];
         $content = file_get_contents('php://input');
-        $datas = get_object_vars(json_decode( $content));     
-        $schemaName = $this->GetParameterString($_GET,'schemaName');
-        $tableName= $this->GetParameterString($_GET,'tableName');
-        $this->Connect();
-        $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
-        $whereExpressions = [];
-        for($i = 0 ;$i < count($tableColumns);$i++)
+        $jsonValues = json_decode( $content);
+        $inputRows = [];
+        if (is_array($jsonValues))
         {
-            if ($tableColumns[$i]["dataType"] === 'serial')
+            for ($i = 0;$i < count($jsonValues);$i++)
             {
-               foreach ($datas as $key => $value)
-               {
-                    if ($key === $tableColumns[$i]['name'])
-                    {
-                        $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
-                        array_push($whereExpressions,$whereExpression);
-                    }
-               }
+                $inputRow = get_object_vars($jsonValues[$i]);   
+                array_push($inputRows,$inputRow);
             }
         }
-        $sql = "delete from ".$schemaName.".".$tableName." where ".implode(" or ",$whereExpressions);
-        $result = pg_query($this->connection, $sql);   
+        else
+        {
+            $inputRow = get_object_vars($jsonValues);   
+            array_push($inputRows,$inputRow);
+        }
+        for ($j = 0; $j < count($inputRows);$j++)
+        {
+            $datas = $inputRows[$j];     
+            $schemaName = $this->GetParameterString($_GET,'schemaName');
+            $tableName= $this->GetParameterString($_GET,'tableName');
+            $this->Connect();
+            $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
+            $whereExpressions = [];
+            for($i = 0 ;$i < count($tableColumns);$i++)
+            {
+                if ($tableColumns[$i]["dataType"] === 'serial')
+                {
+                   foreach ($datas as $key => $value)
+                   {
+                        if ($key === $tableColumns[$i]['name'])
+                        {
+                            $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
+                            array_push($whereExpressions,$whereExpression);
+                        }
+                   }
+                }
+            }
+            $sql = "delete from ".$schemaName.".".$tableName." where ".implode(" or ",$whereExpressions);
+            $result = pg_query($this->connection, $sql);   
+        }
+        
         $this->Disconnect();
         $datas = [];
         $datas["rows"] = [];

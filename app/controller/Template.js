@@ -34,6 +34,8 @@ Ext.define('GeoPatrimoine.controller.Template', {
                },
                'paneltemplatetree': {
                    addFolderClick: this.onAddFolderClick,
+                   editFolderClick: this.onEditFolderClick,
+                   deleteFolderClick: this.onDeleteFolderClick,
                    addLayerClick: this.onAddLayerClick,
                    editLayerOrderClick: this.onEditLayerOrderClick
 
@@ -58,15 +60,80 @@ Ext.define('GeoPatrimoine.controller.Template', {
             GeoPatrimoine.user.preferences().each(function (pref) {
                 if (pref.data.property === 'selected_template')
                 {
-                    me.getComboTemplate().setValue(parseInt(pref.data.value));
+                    me.getComboTemplate().setValue(parseInt(pref.data.value,0));
                 }
             });
         }
     },
+    onDeleteFolderClick: function (nodeId) {
+        var folder = GeoPatrimoine.template.getNodeById(nodeId);
+        var me = this;
+        Ext.Msg.show({
+            title: 'Confirmation de suppression',
+            msg: 'Etes-vous sur de vouloir supprimer le dossier ' + folder.data.display_name + ' ?',
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            fn: function (buttonId, text, opts) {
+                if (buttonId === 'yes') {
+                    var nodeStore = GeoPatrimoine.template.nodes();
+                    me.recurseRemoveFolder(nodeStore, folder);
+                    nodeStore.remove(folder);
+                    nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+                    nodeStore.sync(
+                    {
+                        success: function () {
+                            GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
+                        },
+                        failure: function () {
+
+                        }
+                    }
+                   );
+
+                }
+            }
+        });
+    },
+    onEditFolderClick: function (nodeId) {
+        var folder = GeoPatrimoine.template.getNodeById(nodeId);
+        var window = Ext.create('GeoPatrimoine.view.template.WindowFolder', {
+            title: 'Creation d\'un dossier'
+        });
+        window.show();
+        var form = window.down("form");
+        form.loadRecord(folder);
+        window.down("#buttton-cancel").on('click', this.onButtonCancelEditFolderClick, this, nodeId);
+        window.down("#buttton-ok").on('click', this.onButtonOkEditFolderClick, this, nodeId);
+    },
+    onButtonOkEditFolderClick: function (button, e, nodeId) {
+        var me = this;
+        var folder = GeoPatrimoine.template.getNodeById(nodeId);
+        var window = button.up("window");
+        var form = window.down("form");
+        var values = form.getValues();
+        folder.set(values);
+        folder.setDirty();
+        var nodeStore = GeoPatrimoine.template.nodes();
+        
+        nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+        nodeStore.sync({
+            success: function () {
+                GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
+                window.close();
+
+            },
+            failure: function ()
+            { window.close(); }
+        });
+    },
+    onButtonCancelEditFolderClick: function (button) {
+        var window = button.up("window");
+        window.close();
+    },
     onAddFolderClick : function(parentId)
     {
         var window = Ext.create('GeoPatrimoine.view.template.WindowFolder', {
-            title:'Création d\'un dossier'
+            title:'Creation d\'un dossier'
         });
         window.show();
         window.down("#buttton-cancel").on('click', this.onButtonCancelCreateFolderClick, this, parentId);
@@ -126,18 +193,29 @@ Ext.define('GeoPatrimoine.controller.Template', {
         var window = Ext.create('GeoPatrimoine.view.template.WindowTemplate',
             {
                 icon: './resources/icons/16x16/button-template-create.png',
-                title: 'Nouveau modèle'
+                title: 'Nouveau modele'
             });
         window.show();
         window.down("#buttton-cancel").on('click', this.onButtonCancelCreateTemplateClick,this);
         window.down("#buttton-ok").on('click', this.onButtonOkCreateTemplateClick, this);
+    },
+    
+    recurseRemoveFolder: function (store, folder)
+    {
+        var me = this;
+        store.each(function (node) {
+            if (node!== undefined && node.data.parent_id === folder.data.id) {
+                store.remove(node);
+                me.recurseRemoveFolder(store, node);
+            }
+        });
     },
     onDeleteTemplateClick: function (record) {
        
         var me = this;
         Ext.Msg.show({
             title: 'Confirmation de suppression',
-            msg: 'Etes-vous sur de vouloir supprimer le modèle ' + record.data.display_name + ' ?',
+            msg: 'Etes-vous sur de vouloir supprimer le modele ' + record.data.display_name + ' ?',
             buttons: Ext.Msg.YESNO,
             icon: Ext.Msg.QUESTION,
             fn: function (buttonId, text, opts) {
@@ -197,7 +275,7 @@ Ext.define('GeoPatrimoine.controller.Template', {
             var window = Ext.create('GeoPatrimoine.view.template.WindowTemplate',
             {
                 icon: './resources/icons/16x16/button-template-create.png',
-                title: 'Modifier le modèle'
+                title: 'Modifier le modele'
             });
             window.show();
             var form = window.down("form");

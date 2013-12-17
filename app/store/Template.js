@@ -7,7 +7,7 @@ Ext.define('GeoPatrimoine.store.Template', {
     listeners: {
         beforeload: function (store, operation, eOpts) {
             var proxy = store.getProxy();
-            proxy.extraParams.token = GeoPatrimoine.user.data.token   
+            proxy.extraParams.token = GeoPatrimoine.user.data.token;
         }
         
     }

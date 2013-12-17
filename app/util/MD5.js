@@ -36,7 +36,7 @@ Ext.define('GeoPatrimoine.util.MD5', {
  * Perform a simple self-test to see if the VM is working
  */
     md5_vm_test :function() {
-        return this.hex_md5("abc").toLowerCase() == "900150983cd24fb0d6963f7d28e17f72";
+        return this.hex_md5("abc").toLowerCase() === "900150983cd24fb0d6963f7d28e17f72";
 },
 
 /*

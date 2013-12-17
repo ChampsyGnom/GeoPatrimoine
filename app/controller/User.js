@@ -20,7 +20,7 @@ Ext.define('GeoPatrimoine.controller.User', {
     onPanelHeaderButtonDisconnectClick: function () {
         Ext.util.Cookies.clear('user');
         Ext.util.Cookies.clear('password');
-        this.getTxtUserName().setText("Non authentifié");
+        this.getTxtUserName().setText("Non authentifie");
         GeoPatrimoine.user = null;
         GeoPatrimoine.updateAdminComponentsVisibility();
         this.autoLogin();

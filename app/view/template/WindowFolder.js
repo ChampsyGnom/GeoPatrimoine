@@ -18,7 +18,7 @@ Ext.define('GeoPatrimoine.view.template.WindowFolder', {
                     {
                         xtype: 'textfield',
                         allowBlank: false,
-                        fieldLabel:'Libellé',
+                        fieldLabel:'Libelle',
                         labelWidth: 120,
                         name: 'display_name',
                         value:'Nouveau dossier',

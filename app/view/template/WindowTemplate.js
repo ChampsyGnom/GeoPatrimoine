@@ -21,7 +21,7 @@ Ext.define('GeoPatrimoine.view.template.WindowTemplate', {
                         fieldLabel: GeoPatrimoine.lang.WindowTemplateFieldDisplayNameLabel,
                         labelWidth: 120,
                         name: 'display_name',
-                        value:'Nouveau modèle',
+                        value:'Nouveau modele',
                         margin: 4
 
                     }
