@@ -103,11 +103,13 @@ Ext.application({
         'GeoPatrimoine.view.template.PanelTemplateList',
         'GeoPatrimoine.view.template.WindowTemplate',
         'GeoPatrimoine.view.search.FieldGoogleLocationSearch',
-        'GeoPatrimoine.view.template.WindowFolder'
+        'GeoPatrimoine.view.template.WindowFolder',
+        'GeoPatrimoine.view.template.WindowLayer',
+        'GeoPatrimoine.view.template.PanelLayerTile'
     ],
-    models: ['lang.Lang', 'lang.LangResource', 'user.User','template.Template','template.Node','template.NodeType','Param','style.Style','style.Rule','style.Label'],
-    stores: ['GeoPatrimoine.store.LangResource', 'User', 'Template'],
-    controllers: ['User','Template'],
+    models: ['lang.Lang', 'lang.LangResource', 'user.User','template.Template','template.Node','template.NodeType','Param','style.Style','style.Rule','style.Label','WmsLayer'],
+    stores: ['GeoPatrimoine.store.LangResource', 'User', 'Template','NodeType','WmsLayer'],
+    controllers: ['User','Template','Map'],
     init: function (application) {
         console.log("init");
      

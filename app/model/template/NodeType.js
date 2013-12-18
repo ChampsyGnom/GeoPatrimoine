@@ -16,10 +16,12 @@ Ext.define('GeoPatrimoine.model.template.NodeType', {
         batchOrder: 'destroy,create,update',
         noCache: false,
         type: 'rest',
-        url: './data/rest.php',
+        url: './data/rest-service.php',
         extraParams: {
             schemaName: 'public',
             tableName: 'node_type',
+            source: 'database',
+            output: 'json',
             childTables: Ext.JSON.encode([])
         },
         reader: {

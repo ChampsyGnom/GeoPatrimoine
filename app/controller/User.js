@@ -106,7 +106,8 @@ Ext.define('GeoPatrimoine.controller.User', {
               property: 'password',
               value: 'md5_' + password
           }]);
-
+       
+       
         storeUser.load(
         {
             callback: function (records, operation, success) {

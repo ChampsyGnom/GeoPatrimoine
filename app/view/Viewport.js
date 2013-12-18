@@ -76,6 +76,7 @@ Ext.define('GeoPatrimoine.view.Viewport', {
                                items: [
                                    {
                                        xtype: 'panelmap',
+                                       itemId:'main-map',
                                        region:'center'
                                    },
                                    {

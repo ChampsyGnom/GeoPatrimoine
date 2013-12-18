@@ -81,10 +81,13 @@
       animation-delay: -0.4s;
     }
 
-    .container1 .circle4 {
-      -webkit-animation-delay: -0.3s;
-      animation-delay: -0.3s;
-    }
+        .container1 .circle4
+        {
+            -webkit-animation-delay: -0.3s;
+            -moz-animation-delay: -0.3s;
+            -o-animation-delay: -0.3s;
+            animation-delay: -0.3s;
+        }
 
     .container2 .circle4 {
       -webkit-animation-delay: -0.2s;
@@ -96,9 +99,21 @@
       animation-delay: -0.1s;
     }
 
-    @-webkit-keyframes bouncedelay {
-      0%, 80%, 100% { -webkit-transform: scale(0.0) }
-      40% { -webkit-transform: scale(1.0) }
+    @-webkit-keyframes bouncedelay
+    {
+        0%, 80%, 100%
+        {
+            -webkit-transform: scale(0.0) transform: scale(0.0);
+        }
+
+        40%
+        {
+            -webkit-transform: scale(1.0);
+            -moz-transform: scale(1.0);
+            -ms-transform: scale(1.0);
+            -o-transform: scale(1.0);
+            transform: scale(1.0);
+        }
     }
 
     @keyframes bouncedelay {

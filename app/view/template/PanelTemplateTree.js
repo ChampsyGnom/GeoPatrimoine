@@ -17,6 +17,7 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                 },
                 listeners: {
                     drop: function (node, data, overModel, dropPosition) {
+                        this.up("paneltemplatetree").saveTreeNodes();
                         
                     },
                     notifyDrop: function (dragSource, event, data) {
@@ -34,6 +35,15 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
             rootVisible:false,
             listeners:
             {
+                checkchange: function (node, checked, eOpts)
+                {
+                    if (checked)
+                    { GeoPatrimoine.user.setPreferenceValue(node.data.itemId, "checked", "true", false); }
+                    else
+                    { GeoPatrimoine.user.setPreferenceValue(node.data.itemId, "checked", "false", false); }
+                    
+                    GeoPatrimoine.user.preferences().sync();
+                },
                 itemcollapse : function( treeNode, eOpts )
                 {
                     if (GeoPatrimoine.user !== undefined && GeoPatrimoine.user !== null)
@@ -82,56 +92,53 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                     var contextMenu = null;
                     var panelTreeTemplate = tree.up("paneltemplatetree");
                     var menuItems = [];
+                    var nodeRecord = GeoPatrimoine.template.getNodeById(record.data.itemId);
                     if (GeoPatrimoine.template !== null && GeoPatrimoine.user.isGeoPatrimoineAdministrator()) {
 
-                      menuItems.push(
-                      {
-                          text: 'Creer un sous-dossier',
-                          handler: function ()
-                          { panelTreeTemplate.fireEvent('addFolderClick', record.data.itemId); },
-                          iconCls: 'menu-folder-add'
-                      });
-                       menuItems.push(
-                       {
-                           text: 'Modifier ce dossier',
-                           handler: function ()
-                           { panelTreeTemplate.fireEvent('editFolderClick', record.data.itemId); },
-                           iconCls: 'menu-folder-edit'
-                       });
-                       menuItems.push(
-                       {
-                            text: 'Supprimer ce dossier',
-                            handler: function ()
-                            { panelTreeTemplate.fireEvent('deleteFolderClick', record.data.itemId); },
-                            iconCls: 'menu-folder-delete'
-                       });
+                        if (nodeRecord.data.node_type__id === 1)
+                        {
+                            menuItems.push(
+                            {
+                                text: 'Nouveau dossier',
+                                handler: function ()
+                                { panelTreeTemplate.fireEvent('addFolderClick', record.data.itemId); },
+                                iconCls: 'menu-folder-add'
+                            });
+                            menuItems.push(
+                           {
+                               text: 'Nouvelle couche',
+                               handler: function ()
+                               { panelTreeTemplate.fireEvent('addLayerClick', record.data.itemId); },
+                               iconCls: 'menu-layer-add'
+                           });
+                            menuItems.push({
+                                xtype:'menuseparator'
+                            });
+                            menuItems.push(
+                            {
+                                text: 'Modifier ce dossier',
+                                handler: function ()
+                                { panelTreeTemplate.fireEvent('editFolderClick', record.data.itemId); },
+                                iconCls: 'menu-folder-edit'
+                            });
+                            menuItems.push(
+                            {
+                                text: 'Supprimer ce dossier',
+                                handler: function ()
+                                { panelTreeTemplate.fireEvent('deleteFolderClick', record.data.itemId); },
+                                iconCls: 'menu-folder-delete'
+                            });
 
+                        }
+                      
 
-                        contextMenu = new Ext.menu.Menu({
-                            items: [
-                                {
-                                    text: 'Nouveau dossier', handler: function () {
-                                        panelTreeTemplate.fireEvent('addFolderClick');
-                                    },
-                                    iconCls: 'menu-folder-add'
-                                },
-                                {
-                                    text: 'Nouvelle couche', handler: function () {
-                                        panelTreeTemplate.fireEvent('addLayerClick');
-                                    }, iconCls: 'menu-layer-add'
-                                },
-                                {
-                                    text: 'Modifier l\'ordre des couches', handler: function () {
-                                        panelTreeTemplate.fireEvent('editLayerOrderClick');
-                                    }, iconCls: 'menu-layer-order'
-                                }
-                            ]
-                        });
+                       
 
                       
                     }
                     if (menuItems.length > 0)
                     {
+                        
                         contextMenu = new Ext.menu.Menu({
                             items: menuItems
                         });
@@ -158,13 +165,45 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
     {
         this.buildTreeNodes();
     },
-    buildTreeNodes: function ()
+    saveTreeNodes: function ()
     {
         var treePanel = this.down("treepanel");
         var rootNode = treePanel.getRootNode();
-        rootNode.removeAll();
-        this.recurseBuildTreeNodes(null, rootNode);
+        this.recurseSaveTreeNode(rootNode);
+        GeoPatrimoine.template.nodes().getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+        GeoPatrimoine.template.nodes().sync();
+        console.log('save node hierarchy');
+    },
+    recurseSaveTreeNode : function(parentNode)
+    {
+        var me = this;
+        parentNode.eachChild(function (child) {
+            if (child.data.itemId !== undefined && child.data.itemId !== null)
+            {
+                var record = GeoPatrimoine.template.getNodeById(child.data.itemId);
+                if (parentNode.data.itemId !== undefined && parentNode.data.itemId !== null)
+                { record.data.parent_id = parentNode.data.itemId; }
+                else
+                { record.data.parent_id = null; }
+                record.data.tree_order = parentNode.indexOf(child);
+                record.setDirty();
+                me.recurseSaveTreeNode(child);
+            }
+        });
+    },
+    buildTreeNodes: function ()
+    {
 
+        var treePanel = this.down("treepanel");
+        var rootNode = treePanel.getRootNode();
+        rootNode.removeAll();
+        if (GeoPatrimoine.template !== null)
+        {
+            GeoPatrimoine.template.nodes().sort("tree_order", "ASC");
+            this.recurseBuildTreeNodes(null, rootNode);
+        }
+      
+        // sort by tree order
     },
     recurseBuildTreeNodes: function (parentId,parentNode)
     {
@@ -185,9 +224,20 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                     node.data.itemId = item.data.id;
                     me.recurseBuildTreeNodes( item.data.id,node);
                 }
-                else {
-                   // var checkedPref = eCarto.loggedUser.getPreferenceValue(item.data.id, 'checked');
-                   // var checked = checkedPref === 'true';
+                else if (item.data.node_type__id === 2) {
+                    var checkedPref = GeoPatrimoine.user.getPreferenceValue(item.data.id, 'checked');
+                    var checked = checkedPref === 'true';
+                    node = parentNode.appendChild({
+                        text: item.data.display_name,
+                        leaf: true,
+                        checked: checked
+                    });
+                    node.data.itemId = item.data.id;
+                }
+                else
+                {
+                    // var checkedPref = eCarto.loggedUser.getPreferenceValue(item.data.id, 'checked');
+                    // var checked = checkedPref === 'true';
                     node = parentNode.appendChild({
                         text: item.data.display_name,
                         leaf: true,

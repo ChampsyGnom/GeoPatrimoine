@@ -31,37 +31,51 @@ class RestDatabaseSource extends RestAbstractSource
     {
         $this->ValidateToken($_GET);
         $datas = [];
-        $content = file_get_contents('php://input');
-        $datas = get_object_vars(json_decode( $content));          
-        $schemaName = $this->GetParameterString($_GET,'schemaName');
-        $tableName= $this->GetParameterString($_GET,'tableName');
-        $this->Connect();
-        $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
-        $whereExpressions = [];
-        $updateExpressions = [];
-         for($i = 0 ;$i < count($tableColumns);$i++)
-         {
-            foreach ($datas as $key => $value)
-            {
-                if ($key === $tableColumns[$i]['name'])
-                {
-                    if ($tableColumns[$i]["dataType"] === 'serial')
-                    {
-                        $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
-                        array_push($whereExpressions,$whereExpression);
-                    }
-                    else
-                    {
-                        $updateExpression = $this->GetUpdateExpression($schemaName,$tableName,$tableColumns[$i],$value);
-                        array_push($updateExpressions,$updateExpression);
-                    }
-                   
-                }
-            }
-            
+        $contentInput = file_get_contents('php://input');
+        $jsonInput= json_decode( $contentInput);
+        $rowsInput = [];
+        if (is_array($jsonInput))
+        {
+            for ($i = 0 ; $i < count($jsonInput);$i++)
+            {array_push($rowsInput,get_object_vars( $jsonInput[$i])); }
         }
-        $sql = "update ".$schemaName.".".$tableName." set ".implode(",",$updateExpressions)." where ".implode(" and ",$whereExpressions);       
-        $result = pg_query($this->connection, $sql);   
+        else
+        {array_push($rowsInput,get_object_vars( $jsonInput)); }
+        
+        for($r = 0 ; $r < count($rowsInput);$r++)
+        {
+            $datas = $rowsInput[$r];          
+            $schemaName = $this->GetParameterString($_GET,'schemaName');
+            $tableName= $this->GetParameterString($_GET,'tableName');
+            $this->Connect();
+            $tableColumns = $this->GetColumnInfos($schemaName,$tableName);
+            $whereExpressions = [];
+            $updateExpressions = [];
+             for($i = 0 ;$i < count($tableColumns);$i++)
+             {
+                foreach ($datas as $key => $value)
+                {
+                    if ($key === $tableColumns[$i]['name'])
+                    {
+                        if ($tableColumns[$i]["dataType"] === 'serial')
+                        {
+                            $whereExpression = $this->GetWhereExpression($schemaName,$tableName,$tableColumns[$i],"=",$value);
+                            array_push($whereExpressions,$whereExpression);
+                        }
+                        else
+                        {
+                            $updateExpression = $this->GetUpdateExpression($schemaName,$tableName,$tableColumns[$i],$value);
+                            array_push($updateExpressions,$updateExpression);
+                        }
+                   
+                    }
+                }
+            
+            }
+            $sql = "update ".$schemaName.".".$tableName." set ".implode(",",$updateExpressions)." where ".implode(" and ",$whereExpressions);       
+            $result = pg_query($this->connection, $sql);   
+        }
+        
         
         $this->Disconnect();
         

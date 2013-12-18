@@ -48,10 +48,13 @@ Ext.define('GeoPatrimoine.controller.Template', {
         GeoPatrimoine.getApplication().on('userlogged', this.onUserLogged, this);
 
     },
+
+    //#region Gestion des évenement de login unlogin du user
     onUserUnlogged : function()
     {
         this.getComboTemplate().setValue(null);
     },
+
     onUserLogged: function ()
     {
         var me = this;
@@ -65,6 +68,9 @@ Ext.define('GeoPatrimoine.controller.Template', {
             });
         }
     },
+    //#endregion
+
+    //#region Gestion des évenement ajout,modification supression de dossier
     onDeleteFolderClick: function (nodeId) {
         var folder = GeoPatrimoine.template.getNodeById(nodeId);
         var me = this;
@@ -141,6 +147,12 @@ Ext.define('GeoPatrimoine.controller.Template', {
     },
     onButtonOkCreateFolderClick: function (button,e,parentId) {
         var me = this;
+        var parentRecord = null;
+        if (parentId !== undefined && parentId !== null)
+        {
+            parentRecord = GeoPatrimoine.template.getNodeById(parentId);
+            GeoPatrimoine.user.setPreferenceValue(parentId, "expanded", "true", true);
+        }
         var folder = Ext.create('GeoPatrimoine.model.template.Node');
         var window = button.up("window");
         var form = window.down("form");
@@ -148,6 +160,9 @@ Ext.define('GeoPatrimoine.controller.Template', {
         folder.set(values);
         var nodeStore = GeoPatrimoine.template.nodes();
         folder.data.parent_id = parentId;
+        var treeOrder = GeoPatrimoine.template.getNextTreeOrder(parentId);
+        folder.data.tree_order = treeOrder;
+
         nodeStore.add(folder);
         nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
         nodeStore.sync({
@@ -166,11 +181,65 @@ Ext.define('GeoPatrimoine.controller.Template', {
         var window = button.up("window");
         window.close();
     },
-    onAddLayerClick : function ()
-    {},
+    recurseRemoveFolder: function (store, folder) {
+        var me = this;
+        store.each(function (node) {
+            if (node !== undefined && node.data.parent_id === folder.data.id) {
+                store.remove(node);
+                me.recurseRemoveFolder(store, node);
+            }
+        });
+    },
+    //#endregion
+
+
+    //#region Gestion des évenement ajout,modification supression de couche
+    onAddLayerClick : function (parentId)
+    {
+        var window = Ext.create('GeoPatrimoine.view.template.WindowLayer', {
+            title:'Nouvelle couche'
+        });
+        window.down("#buttton-cancel").on('click', this.onButtonCancelCreateLayerClick, this, parentId);
+        window.down("#buttton-ok").on('click', this.onButtonOkCreateLayerClick, this, parentId);
+        window.show();
+    },
+    //#endregion
+
+    onButtonCancelCreateLayerClick: function (button, e, parentId)
+    {
+        var window = button.up("window");
+        window.close();
+    },
+    onButtonOkCreateLayerClick: function (button, e, parentId)
+    {
+        var window = button.up("window");
+        var form = window.down("form");
+        var values = form.getValues();
+        var layer = Ext.create('GeoPatrimoine.model.template.Node');
+        layer.set(values);
+        layer.data.parent_id = parentId;
+        var nodeStore = GeoPatrimoine.template.nodes();
+
+        var treeOrder = GeoPatrimoine.template.getNextTreeOrder(parentId);
+        layer.data.tree_order = treeOrder;
+        nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+        nodeStore.add(layer);
+        nodeStore.sync({
+            success: function ()
+            {
+                GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
+                window.close();
+            },
+            failure: function ()
+            {
+                window.close();
+            }
+        });
+    },
     editLayerOrderClick: function ()
     { },
-    
+
+    //#region Gestion des évenement ajout,modification supression de template
     onSelectedTemplateChange: function (template)
     {
         GeoPatrimoine.template = template;
@@ -185,7 +254,7 @@ Ext.define('GeoPatrimoine.controller.Template', {
         { GeoPatrimoine.user.setPreferenceValue(null, 'selected_template', template.data.id, true); }
       
      
-       
+        GeoPatrimoine.getApplication().fireEvent('mapLayerListChange');
 
     },
   
@@ -200,16 +269,7 @@ Ext.define('GeoPatrimoine.controller.Template', {
         window.down("#buttton-ok").on('click', this.onButtonOkCreateTemplateClick, this);
     },
     
-    recurseRemoveFolder: function (store, folder)
-    {
-        var me = this;
-        store.each(function (node) {
-            if (node!== undefined && node.data.parent_id === folder.data.id) {
-                store.remove(node);
-                me.recurseRemoveFolder(store, node);
-            }
-        });
-    },
+    
     onDeleteTemplateClick: function (record) {
        
         var me = this;
@@ -311,7 +371,7 @@ Ext.define('GeoPatrimoine.controller.Template', {
         });
     }
 
-
+    //#endregion
     
 
 

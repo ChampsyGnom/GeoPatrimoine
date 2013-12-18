@@ -72,6 +72,25 @@ Ext.define('GeoPatrimoine.model.template.Template', {
 
         }
     },
+    getNextTreeOrder: function (parentNodeId)
+    {
+        var maxTreeOrder = 0;
+        var hasChild = false;
+        if (parentNodeId === undefined)
+        { parentNodeId = null; }
+        this.nodes().each(function (node) {
+            if (node.data.parent_id === parentNodeId)
+            {
+                hasChild = true;
+                if (node.data.tree_order > maxTreeOrder)
+                { maxTreeOrder = node.data.tree_order; }
+            }
+        });
+        if (hasChild)
+        { return maxTreeOrder + 1; }
+        else { return 0;}
+      
+    },
     getNodeById: function (nodeId)
     {
         var findNode = null;
