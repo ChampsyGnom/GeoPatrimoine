@@ -42,7 +42,16 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                     else
                     { GeoPatrimoine.user.setPreferenceValue(node.data.itemId, "checked", "false", false); }
                     
-                    GeoPatrimoine.user.preferences().sync();
+                    GeoPatrimoine.user.preferences().sync(
+                        {
+                            success: function ()
+                            {
+                                GeoPatrimoine.getApplication().fireEvent('mapLayerVisibilityChange');
+                            },
+                            failure: function ()
+                            { }
+                        }
+                        );
                 },
                 itemcollapse : function( treeNode, eOpts )
                 {

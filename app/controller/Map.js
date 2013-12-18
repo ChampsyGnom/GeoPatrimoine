@@ -9,7 +9,9 @@
     ],
     init: function () {
 
-        GeoPatrimoine.getApplication().on('mapLayerListChange', this.onMapLayerListChange,this);
+        GeoPatrimoine.getApplication().on('mapLayerListChange', this.onMapLayerListChange, this);
+        GeoPatrimoine.getApplication().on('mapLayerVisibilityChange', this.onMapLayerVisibilityChange, this);
+        //mapLayerVisibilityChange
     },
     teleportTo: function (epsg, center_x, center_y) {
         var panelMap = this.getPanelMap();
@@ -27,6 +29,28 @@
         var center = ol.proj.transform([parseFloat(center_x), parseFloat(center_y)], srcProj, dstProj);
         olMap.getView().setCenter(center);
         
+    },
+    onMapLayerVisibilityChange: function ()
+    {
+
+        var panelMap = this.getPanelMap();
+        var olMap = panelMap.map;
+        var layers = olMap.getLayers();
+        layers.forEach(function (layer) {
+            if (layer.nodeId !== undefined && layer.nodeId !== null)
+            {
+                var nodeRecord = GeoPatrimoine.template.getNodeById(layer.nodeId);
+                if (nodeRecord !== null)
+                {
+                    var isChecked = GeoPatrimoine.user.getPreferenceValue(layer.nodeId, 'checked');
+                    var isVisible = isChecked === 'true';
+                    layer.setVisible(isVisible);
+                    console.log("couche " + nodeRecord.data.display_name + " visible " + isVisible);
+                }
+            }
+        });
+        
+
     },
     onMapLayerListChange: function ()
     {
@@ -71,13 +95,15 @@
     },
     createLayerFromNode: function (node)
     {
+        var isChecked = GeoPatrimoine.user.getPreferenceValue(node.data.id, 'checked');
+        var isVisible = isChecked === 'true';
         if (node.data.node_type__id === 2) {
             if (node.data.tile_source === 'Osm') {
                 layer = new ol.layer.Tile({
                     //minResolution: node.data.min_resolution,
                     //maxResolution: node.data.max_resolution,                   
                    // opacity: node.data.opacity / 100,
-                   // visible: true,
+                    visible: isVisible,
                     source: new ol.source.OSM()
 
                 });
@@ -89,10 +115,10 @@
 
             if (node.data.tile_source === "MapQuest") {
                 layer = new ol.layer.Tile({
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                   
-                    opacity: node.data.opacity / 100,
-                    visible: false,
+                 //   minResolution: node.data.min_resolution,
+                 //   maxResolution: node.data.max_resolution,                   
+                  //  opacity: node.data.opacity / 100,
+                    visible: isVisible,
                     source: new ol.source.MapQuestOSM()
                 });                
                 layer.nodeId = node.data.id;
@@ -101,10 +127,10 @@
 
             if (node.data.tile_source === "MapQuestAerial") {
                 layer = new ol.layer.Tile({
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                  
-                    opacity: node.data.opacity / 100,
-                    visible: false,
+                   // minResolution: node.data.min_resolution,
+                  //  maxResolution: node.data.max_resolution,                  
+                  //  opacity: node.data.opacity / 100,
+                    visible: isVisible,
                     source: new ol.source.MapQuestOpenAerial()
                 });
                 layer.nodeId = node.data.id;
@@ -114,10 +140,10 @@
 
                 layer = new ol.layer.Tile({
                     preload: Infinity,
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                   
-                    opacity: node.data.opacity / 100,
-                    visible: false,
+                  //  minResolution: node.data.min_resolution,
+                  //  maxResolution: node.data.max_resolution,                   
+                  //  opacity: node.data.opacity / 100,
+                    visible: isVisible,
                     source: new ol.source.BingMaps({
                         key: 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3',
                         imagerySet: ['Road']
@@ -130,11 +156,11 @@
             if (node.data.tile_source === "BingAerial") {
 
                 layer = new ol.layer.Tile({
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                   
-                    opacity: node.data.opacity / 100,
-                    preload: Infinity,
-                    visible: false,
+                   // minResolution: node.data.min_resolution,
+                  //  maxResolution: node.data.max_resolution,                   
+                  //  opacity: node.data.opacity / 100,
+                  //  preload: Infinity,
+                    visible: isVisible,
                     source: new ol.source.BingMaps({
                         key: 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3',
                         imagerySet: ['Aerial']
@@ -148,11 +174,11 @@
             if (node.data.tile_source === "BingHybrid") {
 
                 layer = new ol.layer.Tile({
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                    
-                    opacity: node.data.opacity / 100,
-                    preload: Infinity,
-                    visible: false,
+                  //  minResolution: node.data.min_resolution,
+                  //  maxResolution: node.data.max_resolution,                    
+                  //  opacity: node.data.opacity / 100,
+                  //  preload: Infinity,
+                    visible: isVisible,
                     source: new ol.source.BingMaps({
                         key: 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3',
                         imagerySet: ['AerialWithLabels']
@@ -166,10 +192,10 @@
             if (node.data.tile_source === "XYZ") {
                 layer =
                       new ol.layer.Tile({
-                          minResolution: node.data.min_resolution,
-                          maxResolution: node.data.max_resolution,                         
-                          opacity: node.data.opacity / 100,
-                          visible: false,
+                   //       minResolution: node.data.min_resolution,
+                    //      maxResolution: node.data.max_resolution,                         
+                   //       opacity: node.data.opacity / 100,
+                          visible: isVisible,
                           source: new ol.source.XYZ({
                               url: node.data.tile_source_xyz_url
                           })
@@ -180,10 +206,10 @@
             if (node.data.tile_source === "WMS") {
 
                 layer = new ol.layer.Tile({
-                    minResolution: node.data.min_resolution,
-                    maxResolution: node.data.max_resolution,                   
-                    opacity: node.data.opacity / 100,
-                    visible: false,
+                 //   minResolution: node.data.min_resolution,
+                //    maxResolution: node.data.max_resolution,                   
+                //    opacity: node.data.opacity / 100,
+                    visible: isVisible,
                     source: new ol.source.TileWMS({
                         url: node.data.tile_source_wms_url,
                         params: { 'LAYERS': node.data.tile_source_wms_layer, 'TILED': true }

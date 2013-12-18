@@ -229,6 +229,7 @@ Ext.define('GeoPatrimoine.controller.Template', {
             {
                 GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
                 window.close();
+                GeoPatrimoine.getApplication().fireEvent('mapLayerListChange');
             },
             failure: function ()
             {

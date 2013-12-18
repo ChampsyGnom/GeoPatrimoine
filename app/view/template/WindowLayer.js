@@ -91,6 +91,10 @@
                                     {
                                         "id": 3,
                                         "display_name": "PostgreSQL"
+                                    },
+                                    {
+                                        "id": 4,
+                                        "display_name": "Wfs"
                                     }
                             ]
                         }),
@@ -107,6 +111,9 @@
                                 var window = combo.up("window");
                                 window.down("panellayertile").hide();
                                 window.down("panellayertile").disable();
+
+                                window.down("panellayerwfs").hide();
+                                window.down("panellayerwfs").disable();
                                 if (newValue === 2) {
                                     window.down("panellayertile").enable();
                                     window.down("panellayertile").show();
@@ -116,10 +123,15 @@
                                  
 
                                 }
+                                if (newValue === 4) {
+                                    window.down("panellayerwfs").enable();
+                                    window.down("panellayerwfs").show();
+                                }
                                
                             }
                         }
-                    },                   
+                    },
+                   
                     {
                         xtype: 'panellayertile',
                         hidden: true,                       
@@ -128,6 +140,13 @@
                         disabled: true
                         
 
+                    },
+                    {
+                        xtype: 'panellayerwfs',
+                        hidden: true,
+                        margin: 0,
+                        flex: 1,
+                        disabled: true
                     }
                 ],
                 buttons: [

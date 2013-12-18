@@ -4,7 +4,8 @@
     {       
       
        header('Content-Type: application/json');
-       $content =  file_get_contents($_GET['url']."?version=1.1.1&service=WMS&request=GetCapabilities");
+       $content =  file_get_contents($_GET['url']."?service=WMS&request=GetCapabilities");      
+       //echo $content;
        $xml=simplexml_load_string($content);
        $layerInfos = [];
        if ($xml->WMT_MS_Capabilities !== null)
@@ -12,15 +13,14 @@
              
              foreach ( $xml->Capability->Layer as $serverLayer) 
              {                 
-                 $srs = [];
-                 foreach ( $serverLayer->SRS as $sr) 
-                 {array_push($srs,(string) $sr);}
+                 
                  foreach ( $serverLayer->Layer as $layer) 
                  {
+                  
                     $layerInfo = [];
-                    $layerInfo["Name"] = (string) $layer->Name;
-                    $layerInfo["Title"] = (string) $layer->Title;
-                    $layerInfo["SRS"] =str_replace("EPSG:","", ( (string) $layer->SRS));
+                    $layerInfo["name"] = (string) $layer->Name;
+                    $layerInfo["display_name"] = (string) $layer->Title;
+                    $layerInfo["epsg"]  = str_replace("EPSG:","" , ((string) $layer->CRS));
                     array_push($layerInfos,$layerInfo);
                  }
              }

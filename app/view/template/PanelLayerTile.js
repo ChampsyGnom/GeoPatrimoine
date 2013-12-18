@@ -160,7 +160,7 @@
             listeners: {
                 change: function (combo, newValue, oldValue, eOpts) {
 
-                    var wmsLayerStore = Ext.StoreManager.lookup('WmsLayer');
+                    var wmsLayerStore = Ext.StoreManager.lookup('WmsVectorDataTable');
                     wmsLayerStore.getProxy().extraParams.url = newValue;
                     combo.up("panellayertile").down("#combo-tile-wms-layer").setValue(null);
                 }
@@ -179,9 +179,9 @@
             hidden: true,
             itemId: 'combo-tile-wms-layer',
             name: 'tile_source_wms_layer',
-            displayField: 'Title',
-            valueField: 'Name',
-            store: 'WmsLayer',
+            displayField: 'display_name',
+            valueField: 'name',
+            store: 'WmsVectorDataTable',
             listeners: {
                 change: function (combo, newValue, oldValue, eOpts) {
                     var txtEpsg = this.up("windowlayer").down("#txt-epsg");
