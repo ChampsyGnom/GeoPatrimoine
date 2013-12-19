@@ -57,7 +57,8 @@ Ext.define('GeoPatrimoine.view.template.PanelLayerWfs', {
             store: Ext.create('Ext.data.Store', {
                 fields: ['url'],
                 data: [                    
-                       { "url": "http://127.0.0.1:8081/geoserver/wfs" }
+                       { "url": "http://127.0.0.1:8081/geoserver/wfs" },
+                       { "url": "http://127.0.0.1:8088/geoserver/wfs" }
                       
                         
                 ]

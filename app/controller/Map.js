@@ -100,47 +100,7 @@ Ext.define('GeoPatrimoine.controller.Map', {
         var isChecked = GeoPatrimoine.user.getPreferenceValue(node.data.id, 'checked');
         var isVisible = isChecked === 'true';
         var layer = null;
-        if (node.data.node_type__id === 4) {
-            var projection = new ol.proj.Projection({
-                code: 'EPSG:' + node.data.epsg
-
-            });
-
-            layer = new ol.layer.Vector({
-                style: new ol.style.Style({
-                    rules: [
-                      new ol.style.Rule({
-                          filter: 'renderIntent("selected")',
-                          symbolizers: [
-                            new ol.style.Fill({
-                                color: '#ffffff',
-                                opacity: 1
-                            })
-                          ]
-                      })
-                    ],
-                    symbolizers: [
-                      new ol.style.Fill({
-                          color: '#ffffff',
-                          opacity: 0.5
-                      }),
-                      new ol.style.Stroke({
-                          color: '#6666ff'
-                      })
-                    ]
-                }),
-                source: new ol.source.Vector({
-                    projection: projection,
-                    parser: new ol.parser.ogc.GML_v3(),
-                    // url: 'http://127.0.0.1:8081/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks'
-                    url: "./data/wfs-proxy.php?url=" + node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
-                })
-                //http://127.0.0.1:8088/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks
-            });
-            layer.nodeId = node.data.id;
-
-            return layer;
-        }
+        
         if (node.data.node_type__id === 2) {
             if (node.data.tile_source === 'Osm') {
                 layer = new ol.layer.Tile({
@@ -267,6 +227,47 @@ Ext.define('GeoPatrimoine.controller.Map', {
 
 
 
+        }
+        if (node.data.node_type__id === 4) {
+            var projection = new ol.proj.Projection({
+                code: 'EPSG:' + node.data.epsg
+
+            });
+
+            layer = new ol.layer.Vector({
+                style: new ol.style.Style({
+
+                    symbolizers: [
+                      new ol.style.Fill({
+                          color: '#ffffff',
+                          opacity: 1
+                      }),
+                      new ol.style.Stroke({
+                          color: '#6666ff',
+                          opacity: 1,
+                          width: 10
+                      }),
+                      new ol.style.Shape({
+                          size: 20,
+                          opacity: 1,
+                          fill: new ol.style.Fill({
+                              color: '#6666ff',
+                              opacity: 1
+                          })
+                      })
+                    ]
+                }),
+                source: new ol.source.Vector({
+                    projection: projection,
+                    parser: new ol.parser.ogc.GML_v3(),
+                    // url: 'http://127.0.0.1:8081/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks'
+                    url: "./data/wfs-proxy.php?url=" + node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
+                })
+                //http://127.0.0.1:8088/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks
+            });
+            layer.nodeId = node.data.id;
+
+            return layer;
         }
        
     },
