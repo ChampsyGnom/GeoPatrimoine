@@ -1,11 +1,14 @@
-﻿Ext.define('GeoPatrimoine.view.template.PanelLayerTile', {
+Ext.define('GeoPatrimoine.view.template.PanelLayerTile', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.panellayertile',
     layout: {
         type: 'vbox',
         align: 'stretch'
     },
-
+    loadRecord : function(record)
+    {
+       
+    },
     initComponent: function (config) {
         this.items = [
         {

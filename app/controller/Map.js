@@ -1,4 +1,4 @@
-﻿Ext.define('GeoPatrimoine.controller.Map', {
+Ext.define('GeoPatrimoine.controller.Map', {
     extend: 'Ext.app.Controller',
     views: ['map.PanelMap'],
     refs: [
@@ -97,6 +97,20 @@
     {
         var isChecked = GeoPatrimoine.user.getPreferenceValue(node.data.id, 'checked');
         var isVisible = isChecked === 'true';
+        var layer = null;
+        if (node.data.node_type__id === 4)
+        {
+            layer = new ol.layer.Vector({                
+                source: new ol.source.Vector({
+                    parser: new ol.parser.ogc.GML_v3(),
+                    url: "./data/wfs-proxy.php?url="+ node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
+                })
+                //http://127.0.0.1:8088/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks
+            });
+            layer.nodeId = node.data.id;
+
+            return layer;
+        }
         if (node.data.node_type__id === 2) {
             if (node.data.tile_source === 'Osm') {
                 layer = new ol.layer.Tile({

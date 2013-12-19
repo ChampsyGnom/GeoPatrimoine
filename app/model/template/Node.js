@@ -31,7 +31,10 @@ Ext.define('GeoPatrimoine.model.template.Node', {
          { name: 'view_table_columns', type: 'string', defaultValue: null, mapping: 'view_table_columns', useNull: true },
          { name: 'view_form_columns', type: 'string', defaultValue: null, mapping: 'view_form_columns', useNull: true },
          { name: 'view_tooltip_columns', type: 'string', defaultValue: null, mapping: 'view_tooltip_columns', useNull: true },
-         { name: 'view_template_columns', type: 'string', defaultValue: null, mapping: 'view_template_columns', useNull: true }
+         { name: 'view_template_columns', type: 'string', defaultValue: null, mapping: 'view_template_columns', useNull: true },
+         { name: 'wfs_url', type: 'string', defaultValue: null, mapping: 'wfs_url', useNull: true },
+         { name: 'wfs_version', type: 'string', defaultValue: null, mapping: 'wfs_version', useNull: true },
+         { name: 'wfs_feature_name', type: 'string', defaultValue: null, mapping: 'wfs_feature_name', useNull: true }
     ],
    
     associations: [

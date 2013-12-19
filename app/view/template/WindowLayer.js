@@ -1,11 +1,44 @@
-﻿Ext.define('GeoPatrimoine.view.template.WindowLayer', {
+Ext.define('GeoPatrimoine.view.template.WindowLayer', {
     extend: 'Ext.window.Window',
     alias: 'widget.windowlayer',
-    width: 400,
+    width: 480,
     closable: true,
     resizable: true,
     y:50,
     modal: true,
+    loadRecord : function(record)
+    {
+        var form = this.down("form");
+        form.loadRecord(record);
+        var panelTile = this.down("panellayertile");
+        var panelWfs = this.down("panellayerwfs");
+       
+       
+    }
+    ,
+    getValues : function()
+    {
+        var values = this.down("form").getValues();
+        console.log(values);
+        var comboTypeLayer = this.down("#combo-type-layer");
+        if (comboTypeLayer.getValue() !== null)
+        {
+            if (comboTypeLayer.getValue() === 3)
+            { }
+            if (comboTypeLayer.getValue() === 4)
+            {
+                var subValues = this.down("panellayerwfs").getValues();
+
+                for (var key in subValues) {
+                    var obj = subValues[key];
+                    values[key] = obj;
+                }
+              
+            }
+        }
+
+        return values;
+    },
     initComponent: function (config) {
 
         this.items = [
@@ -79,6 +112,7 @@
                     {
                         xtype: 'combobox',
                         name: 'node_type__id',
+                        itemId:'combo-type-layer',
                         fieldLabel: 'Type de couche',
                         store: Ext.create('Ext.data.Store', {
                             fields: ['id', 'display_name'],

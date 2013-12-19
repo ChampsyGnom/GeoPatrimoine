@@ -37,6 +37,8 @@ Ext.define('GeoPatrimoine.controller.Template', {
                    editFolderClick: this.onEditFolderClick,
                    deleteFolderClick: this.onDeleteFolderClick,
                    addLayerClick: this.onAddLayerClick,
+                   editLayerClick: this.onEditLayerClick,
+                   deleteLayerClick: this.onDeleteLayerClick,
                    editLayerOrderClick: this.onEditLayerOrderClick
 
                }
@@ -227,8 +229,9 @@ Ext.define('GeoPatrimoine.controller.Template', {
         nodeStore.sync({
             success: function ()
             {
-                GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
+               
                 window.close();
+                GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
                 GeoPatrimoine.getApplication().fireEvent('mapLayerListChange');
             },
             failure: function ()
@@ -237,6 +240,75 @@ Ext.define('GeoPatrimoine.controller.Template', {
             }
         });
     },
+    onEditLayerClick: function (nodeId)
+    {
+        var record = GeoPatrimoine.template.getNodeById(nodeId);
+        var window = Ext.create('GeoPatrimoine.view.template.WindowLayer', {
+            title: 'Nouvelle couche'
+        });
+        window.down("#buttton-cancel").on('click', this.onButtonCancelEditLayerClick, this, nodeId);
+        window.down("#buttton-ok").on('click', this.onButtonOkEditLayerClick, this, nodeId);
+        window.loadRecord(record);
+        window.show();
+    },
+    onButtonCancelEditLayerClick: function (button, e, nodeId)
+    {
+        var window = button.up("window");
+        window.close();
+    },
+    onButtonOkEditLayerClick: function (button, e, nodeId)
+    {
+        var record = GeoPatrimoine.template.getNodeById(nodeId);
+        var window = button.up("window");
+        var form = window.down("form");
+        var values = form.getValues();
+        record.set(values);
+        record.setDirty();
+        var nodeStore = GeoPatrimoine.template.nodes();
+        nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+        nodeStore.sync({
+            success: function () {
+
+                window.close();                
+                GeoPatrimoine.getApplication().fireEvent('mapLayerListChange');
+            },
+            failure: function () {
+                window.close();
+            }
+        });
+    },
+    onDeleteLayerClick: function (nodeId)
+    {
+        var record = GeoPatrimoine.template.getNodeById(nodeId);
+        var me = this;
+        Ext.Msg.show({
+            title: 'Confirmation de suppression',
+            msg: 'Etes-vous sur de vouloir supprimer la couche ' + record.data.display_name + ' ?',
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            fn: function (buttonId, text, opts) {
+                if (buttonId === 'yes') {
+                    var nodeStore = GeoPatrimoine.template.nodes();
+                    nodeStore.remove(record);
+                    nodeStore.getProxy().extraParams.token = GeoPatrimoine.user.data.token;
+                    nodeStore.sync(
+                    {
+                        success: function () {
+                            GeoPatrimoine.getApplication().fireEvent('templateHierarchyChange');
+                            GeoPatrimoine.getApplication().fireEvent('mapLayerListChange');
+                        },
+                        failure: function () {
+
+                        }
+                    }
+                   );
+
+                }
+            }
+        });
+    },
+
+
     editLayerOrderClick: function ()
     { },
 

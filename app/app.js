@@ -108,7 +108,8 @@ Ext.application({
         'GeoPatrimoine.view.template.PanelLayerTile',
         'GeoPatrimoine.view.template.PanelLayerWfs',
         'GeoPatrimoine.model.vector.VectorDataTable',
-        'GeoPatrimoine.model.vector.VectorDataColumn'
+        'GeoPatrimoine.model.vector.VectorDataColumn',
+        'GeoPatrimoine.view.template.PanelLayerVectorColumns'
     ],
     models: ['lang.Lang', 'lang.LangResource', 'user.User', 'template.Template', 'template.Node', 'template.NodeType', 'Param', 'style.Style', 'style.Rule', 'style.Label', 'vector.VectorDataTable'],
     stores: ['GeoPatrimoine.store.LangResource', 'User', 'Template', 'NodeType', 'WmsVectorDataTable', 'WfsVectorDataTable'],

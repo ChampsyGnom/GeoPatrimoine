@@ -139,6 +139,23 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                             });
 
                         }
+                        if (nodeRecord.data.node_type__id === 4)
+                        {
+                            menuItems.push(
+                            {
+                                text: 'Modifier cette couche',
+                                handler: function ()
+                                { panelTreeTemplate.fireEvent('editLayerClick', record.data.itemId); },
+                                iconCls: 'menu-layer-edit'
+                            });
+                            menuItems.push(
+                            {
+                                text: 'Supprimer cette couche',
+                                handler: function ()
+                                { panelTreeTemplate.fireEvent('deleteLayerClick', record.data.itemId); },
+                                iconCls: 'menu-layer-delete'
+                            });
+                        }
                       
 
                        
