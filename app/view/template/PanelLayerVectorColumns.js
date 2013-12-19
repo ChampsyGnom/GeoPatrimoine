@@ -147,8 +147,7 @@ Ext.define('GeoPatrimoine.view.template.PanelLayerVectorColumns', {
                          me.updateButtonsStates();
                      },
                      add: function (store, records, index, eOpts) {
-                         me.updateButtonsStates();
-                         me.fillColumnsIfHiddenFieldIsSet();
+                         me.updateButtonsStates();                         
                      }
                  }
              }),

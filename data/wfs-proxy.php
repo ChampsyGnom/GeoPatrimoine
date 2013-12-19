@@ -1,5 +1,7 @@
 <?php
    // 
+    header("Access-Control-Allow-Orgin: *");
+    header("Access-Control-Allow-Methods: *");
     if (isset($_GET['url']))
     {       
      $json = [];

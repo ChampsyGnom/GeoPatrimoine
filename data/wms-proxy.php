@@ -2,7 +2,8 @@
  //   header('Content-Type: application/xml');
     if (isset($_GET['url']))
     {       
-      
+       header("Access-Control-Allow-Orgin: *");
+       header("Access-Control-Allow-Methods: *");
        header('Content-Type: application/json');
        $content =  file_get_contents($_GET['url']."?service=WMS&request=GetCapabilities");      
        //echo $content;

@@ -29,9 +29,13 @@ Ext.define('GeoPatrimoine.view.template.PanelLayerWfs', {
             var dstStore = panelLayerVectorColumn.down("#grid-columns-dst").getStore();
             dstStore.removeAll();
             srcStore.removeAll();
+           
+            var columns = [];
             recordVectorDataTable.columns().each(function (column) {
-                srcStore.add(column);
+                columns.push(column);              
             });
+            srcStore.loadData(columns);
+            panelLayerVectorColumn.fillColumnsIfHiddenFieldIsSet();
         }
        
     },
@@ -53,7 +57,7 @@ Ext.define('GeoPatrimoine.view.template.PanelLayerWfs', {
             store: Ext.create('Ext.data.Store', {
                 fields: ['url'],
                 data: [                    
-                       { "url": "http://127.0.0.1:8088/geoserver/wfs" }
+                       { "url": "http://127.0.0.1:8081/geoserver/wfs" }
                       
                         
                 ]
@@ -112,6 +116,7 @@ Ext.define('GeoPatrimoine.view.template.PanelLayerWfs', {
                      var record = combo.getStore().findRecord("name", newValue);
                      if (record !== null)
                      {
+                         combo.up("panellayerwfs").up("windowlayer").down("#txt-epsg").setValue(record.data.epsg);
                          combo.up("panellayerwfs").loadVectorDataTableColumn(record);
 
                      }

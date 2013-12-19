@@ -262,12 +262,12 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                 }
                 else
                 {
-                    // var checkedPref = eCarto.loggedUser.getPreferenceValue(item.data.id, 'checked');
-                    // var checked = checkedPref === 'true';
+                    var checkedPref = GeoPatrimoine.user.getPreferenceValue(item.data.id, 'checked');
+                     var checked = checkedPref === 'true';
                     node = parentNode.appendChild({
                         text: item.data.display_name,
                         leaf: true,
-                        checked: false
+                        checked: checked
                     });
                     node.data.itemId = item.data.id;
 

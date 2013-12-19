@@ -95,15 +95,45 @@ Ext.define('GeoPatrimoine.controller.Map', {
     },
     createLayerFromNode: function (node)
     {
+        Ext.data.Connection.prototype.useDefaultXhrHeader = false;
+        Ext.Ajax.useDefaultXhrHeader = false;
         var isChecked = GeoPatrimoine.user.getPreferenceValue(node.data.id, 'checked');
         var isVisible = isChecked === 'true';
         var layer = null;
-        if (node.data.node_type__id === 4)
-        {
-            layer = new ol.layer.Vector({                
+        if (node.data.node_type__id === 4) {
+            var projection = new ol.proj.Projection({
+                code: 'EPSG:' + node.data.epsg
+
+            });
+
+            layer = new ol.layer.Vector({
+                style: new ol.style.Style({
+                    rules: [
+                      new ol.style.Rule({
+                          filter: 'renderIntent("selected")',
+                          symbolizers: [
+                            new ol.style.Fill({
+                                color: '#ffffff',
+                                opacity: 1
+                            })
+                          ]
+                      })
+                    ],
+                    symbolizers: [
+                      new ol.style.Fill({
+                          color: '#ffffff',
+                          opacity: 0.5
+                      }),
+                      new ol.style.Stroke({
+                          color: '#6666ff'
+                      })
+                    ]
+                }),
                 source: new ol.source.Vector({
+                    projection: projection,
                     parser: new ol.parser.ogc.GML_v3(),
-                    url: "./data/wfs-proxy.php?url="+ node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
+                    // url: 'http://127.0.0.1:8081/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks'
+                    url: "./data/wfs-proxy.php?url=" + node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
                 })
                 //http://127.0.0.1:8088/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks
             });
@@ -238,6 +268,7 @@ Ext.define('GeoPatrimoine.controller.Map', {
 
 
         }
+       
     },
     createLayersDefault: function ()
     {
