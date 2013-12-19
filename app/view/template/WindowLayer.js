@@ -145,7 +145,8 @@ Ext.define('GeoPatrimoine.view.template.WindowLayer', {
                                 var window = combo.up("window");
                                 window.down("panellayertile").hide();
                                 window.down("panellayertile").disable();
-
+                                window.down("panellayerpostgre").hide();
+                                window.down("panellayerpostgre").disable();
                                 window.down("panellayerwfs").hide();
                                 window.down("panellayerwfs").disable();
                                 if (newValue === 2) {
@@ -154,7 +155,8 @@ Ext.define('GeoPatrimoine.view.template.WindowLayer', {
                                 }
 
                                 if (newValue === 3) {
-                                 
+                                    window.down("panellayerpostgre").enable();
+                                    window.down("panellayerpostgre").show();
 
                                 }
                                 if (newValue === 4) {
@@ -181,7 +183,14 @@ Ext.define('GeoPatrimoine.view.template.WindowLayer', {
                         margin: 0,
                         flex: 1,
                         disabled: true
-                    }
+                    },
+                     {
+                         xtype: 'panellayerpostgre',
+                         hidden: true,
+                         margin: 0,
+                         flex: 1,
+                         disabled: true
+                     }
                 ],
                 buttons: [
                      {

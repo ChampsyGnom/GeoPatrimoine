@@ -142,6 +142,13 @@ Ext.define('GeoPatrimoine.view.template.PanelTemplateTree', {
                         if (nodeRecord.data.node_type__id === 4)
                         {
                             menuItems.push(
+                           {
+                               text: 'Zoomer sur cette couche',
+                               handler: function ()
+                               { panelTreeTemplate.fireEvent('zoomLayerClick', record.data.itemId); },
+                               iconCls: 'menu-layer-zoom'
+                           });
+                            menuItems.push(
                             {
                                 text: 'Modifier cette couche',
                                 handler: function ()

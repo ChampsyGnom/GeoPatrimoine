@@ -40,7 +40,7 @@ Ext.define('GeoPatrimoine.view.map.PanelMap', {
         var layers = [];
         var projection = new ol.proj.Projection({
             code: 'EPSG:3857',
-            units: ol.proj.Units.METERS
+            units: ol.proj.Units.DEGREES
         });
 
         //;
@@ -205,7 +205,7 @@ Ext.define('GeoPatrimoine.view.map.PanelMap', {
         var layers = [];
         var projection = new ol.proj.Projection({
             code: 'EPSG:3857',
-            units: ol.proj.Units.METERS
+            units: ol.proj.Units.DEGREES
         });
 
 

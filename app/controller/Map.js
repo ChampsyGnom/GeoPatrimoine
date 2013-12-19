@@ -11,19 +11,44 @@ Ext.define('GeoPatrimoine.controller.Map', {
 
         GeoPatrimoine.getApplication().on('mapLayerListChange', this.onMapLayerListChange, this);
         GeoPatrimoine.getApplication().on('mapLayerVisibilityChange', this.onMapLayerVisibilityChange, this);
+
+        this.control(
+            {
+                
+                'paneltemplatetree': {
+                    zoomLayerClick: this.onZoomLayerClick
+                }
+
+            }
+        );
         //mapLayerVisibilityChange
+    },
+    onZoomLayerClick: function (nodeId)
+    {
+        console.log("zoom to layer " + nodeId);
+        var panelMap = this.getPanelMap();
+        var olMap = panelMap.map;
+        var layers = olMap.getLayers();
+        layers.forEach(function (layer) {
+            if (layer.nodeId !== undefined && layer.nodeId !== null && layer.nodeId === nodeId)
+            {
+                var source = layer.getSource();
+                var extent = source.getExtent();
+                console.log(extent);
+            }
+        });
     },
     teleportTo: function (epsg, center_x, center_y) {
         var panelMap = this.getPanelMap();
         var olMap = panelMap.map;
         var dstProj = new ol.proj.Projection({
             code: 'EPSG:' + GeoPatrimoine.template.data.epsg,
-            units: ol.proj.Units.METERS
+            units: ol.proj.Units.DEGREES
         });
 
         var srcProj = new ol.proj.Projection({
             code: 'EPSG:' + epsg,
-            units: ol.proj.Units.METERS
+            units: ol.proj.Units.DEGREES
         });
 
         var center = ol.proj.transform([parseFloat(center_x), parseFloat(center_y)], srcProj, dstProj);
@@ -63,7 +88,7 @@ Ext.define('GeoPatrimoine.controller.Map', {
             this.createLayersTemplate(GeoPatrimoine.template);
             var projection = new ol.proj.Projection({
                 code: 'EPSG:' + GeoPatrimoine.template.data.epsg,
-                units: ol.proj.Units.METERS
+                units: ol.proj.Units.DEGREES
             });
             olMap.getView().setProjection(projection);
             this.teleportTo('4326', GeoPatrimoine.template.data.center_x, GeoPatrimoine.template.data.center_y);
@@ -230,7 +255,8 @@ Ext.define('GeoPatrimoine.controller.Map', {
         }
         if (node.data.node_type__id === 4) {
             var projection = new ol.proj.Projection({
-                code: 'EPSG:' + node.data.epsg
+                code: 'EPSG:' + node.data.epsg,
+                units: ol.proj.Units.DEGREES
 
             });
 
@@ -261,7 +287,8 @@ Ext.define('GeoPatrimoine.controller.Map', {
                     projection: projection,
                     parser: new ol.parser.ogc.GML_v3(),
                     // url: 'http://127.0.0.1:8081/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks'
-                    url: "./data/wfs-proxy.php?url=" + node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
+                    //url: "./data/wfs-proxy.php?url=" + node.data.wfs_url + "?service=wfs&version=2.0.0&request=GetFeature&typeNames=" + node.data.wfs_feature_name
+                    url:'./data/default-data-2.xml'
                 })
                 //http://127.0.0.1:8088/geoserver/wfs?service=wfs&version=2.0.0&request=GetFeature&typeNames=tiger:poly_landmarks
             });
