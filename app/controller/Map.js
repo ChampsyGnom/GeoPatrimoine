@@ -106,16 +106,26 @@ Ext.define('GeoPatrimoine.controller.Map', {
             if (node.data.node_type__id > 1)
             {
                 var layer = me.createLayerFromNode(node);
-                layers.push(layer);
+                if (layer !== null)
+                { layers.push(layer); }
+               
             }
            
         });
         olMap.getLayers().clear();
-        for (var i = 0 ; i < layers.length; i++)
+        if (layers.length > 0)
         {
-            
-            olMap.addLayer(layers[i]);
+            for (var i = 0 ; i < layers.length; i++) {
+
+                olMap.addLayer(layers[i]);
+            }
         }
+        else
+        {
+            console.log("createLayersDefault");
+            this.createLayersDefault();
+        }
+        
 
     },
     createLayerFromNode: function (node)
@@ -253,6 +263,7 @@ Ext.define('GeoPatrimoine.controller.Map', {
 
 
         }
+        /*
         if (node.data.node_type__id === 4) {
             var projection = new ol.proj.Projection({
                 code: 'EPSG:' + node.data.epsg,
@@ -296,6 +307,8 @@ Ext.define('GeoPatrimoine.controller.Map', {
 
             return layer;
         }
+        */
+        return null;
        
     },
     createLayersDefault: function ()

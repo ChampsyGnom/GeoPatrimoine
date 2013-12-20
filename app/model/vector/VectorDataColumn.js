@@ -3,9 +3,9 @@ Ext.define('GeoPatrimoine.model.vector.VectorDataColumn', {
 
     fields: [
          { name: 'name', type: 'string', mapping: 'name', useNull: true, defaultValue: null },
-          { name: 'table_name', type: 'string', mapping: 'table_name', useNull: true, defaultValue: null },
+         { name: 'table_name', type: 'string', mapping: 'table_name', useNull: true, defaultValue: null },
          { name: 'display_name', type: 'string', mapping: 'display_name', useNull: true, defaultValue: null },
-        { name: 'data_type', type: 'string', mapping: 'data_type', useNull: true, defaultValue: null }
+         { name: 'data_type', type: 'string', mapping: 'data_type', useNull: true, defaultValue: null }
 
     ]
 

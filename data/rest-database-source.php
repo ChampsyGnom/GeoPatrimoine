@@ -251,10 +251,105 @@ class RestDatabaseSource extends RestAbstractSource
         return $exp;
        
      }
+     function SelectMetaData()
+     {
+       $datas = [];
+       $rows = [];
+        $scope = $this->GetParameterString($_GET,'scope');
+        if ($scope === 'database')
+        {
+            $iniFile = parse_ini_file("./database.ini", $process_sections = true);
+            foreach ($iniFile as $key => $value)
+            {
+                $row = [];
+                $row["name"] = $key;
+                if (is_array($iniFile[$key]))
+                {
+                  foreach ($iniFile[$key] as $keySub => $valueSub)
+                  {
+                      if ($keySub === 'display_name')
+                      {
+                        $row["display_name"] =$valueSub;
+                      }
+                  }
+                }
+                array_push($rows,$row);
+            }
+        }
+       if ($scope === 'schema')
+       {
+          $databaseName = $this->GetParameterString($_GET,'database_name');
+          $this->Connect($databaseName);
+          $sql = "select schema_name from information_schema.schemata";
+          
+          $sqlRows = $this->FetchAllRows($sql);     
+       
+          for($i = 0 ; $i < count($sqlRows["rows"]);$i++)
+          {
+              $sqlRow  = $sqlRows["rows"][$i];
+              if (
+              $sqlRow['schema_name'] !== 'information_schema' && 
+              $sqlRow['schema_name'] !== 'pg_catalog' && 
+              $sqlRow['schema_name'] !== 'pg_toast' && 
+              $sqlRow['schema_name'] !== 'pg_toast_temp_1' && 
+              $sqlRow['schema_name'] !== 'tiger' && 
+              $sqlRow['schema_name'] !== 'pg_temp_1' && 
+              $sqlRow['schema_name'] !== 'topology')
+              {
+                  $row= [];
+                  $row["name"] = $sqlRow['schema_name'];
+                  $row["display_name"] = $sqlRow['schema_name'];
+                  array_push($rows,$row);
+              }
+          }
+         
+          
+          $this->Disconnect();
+       }
+       if ($scope === 'table')
+       {
+          $databaseName = $this->GetParameterString($_GET,'database_name');
+          $schemaName = $this->GetParameterString($_GET,'schema_name');
+          $this->Connect($databaseName);
+          $sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = '".$schemaName."'";
+          $sqlRows = $this->FetchAllRows($sql); 
+          for($i = 0 ; $i < count($sqlRows["rows"]);$i++)
+          {
+              $sqlRow  = $sqlRows["rows"][$i];
+            
+              $row= [];
+              $row["name"] = $sqlRow['table_name'];
+              $row["display_name"] = $sqlRow['table_name'];
+              $columnInfos = $this->GetColumnInfos($schemaName, $sqlRow['table_name']);
+              $columns = [];
+              for($j = 0 ; $j < count($columnInfos);$j++)
+              {
+                  $columnInfo = $columnInfos[$j];
+                  $column = [];
+                  $column["name"] = $columnInfo["name"];
+                  $column["display_name"] = $columnInfo["name"];
+                  $column["table_name"] = $sqlRow['table_name'];
+                  $column["data_type"] = $columnInfo['dataType'];
+                  array_push($columns,$column);
+              }
+              $row["columns"] = $columns;
+              array_push($rows,$row);
+              
+          }
+         
+          
+          $this->Disconnect();
+       }
+        $datas["rows"] = $rows;
+        $datas["total"] = count($rows);
+        return $datas;
+     }
      function Select() 
      {
        
-        $isLogin = $this->GetParameterBooleanOrDefault($_GET,'isLogin',false);	  
+        $isLogin = $this->GetParameterBooleanOrDefault($_GET,'isLogin',false);	          
+        $isMetaData = $this->GetParameterBooleanOrDefault($_GET,'isMetaData',false);	  
+        if ($isMetaData) return $this->SelectMetaData();
         $schemaName = $this->GetParameterString($_GET,'schemaName');
         $tableName= $this->GetParameterString($_GET,'tableName');
        // echo $isLogin." ".$schemaName." ".$tableName;
@@ -742,7 +837,7 @@ class RestDatabaseSource extends RestAbstractSource
      {
          pg_close ($this->connection);
      }
-     function Connect()
+     function Connect($databaseName = null)
      {
         $this->databaseConfigurations = parse_ini_file("./database.ini", $process_sections = true);
         if (isset($_GET['databaseKey']) && isset($this->databaseConfigurations[$_GET['databaseKey']]))
@@ -751,8 +846,17 @@ class RestDatabaseSource extends RestAbstractSource
         {
           foreach ($this->databaseConfigurations as $databaseId =>  $databaseInfo)
           {
-              if (filter_var($databaseInfo['default'], FILTER_VALIDATE_BOOLEAN))
-              {$this->databaseConfiguration =$databaseInfo;}
+              if ($databaseName === null)
+              {
+                if (filter_var($databaseInfo['default'], FILTER_VALIDATE_BOOLEAN))
+                {$this->databaseConfiguration =$databaseInfo;}
+              }
+              else
+              {
+                if ($databaseId === $databaseName)
+                {$this->databaseConfiguration =$databaseInfo;}
+              }
+              
            
           }         
         }
